@@ -1,0 +1,17 @@
+[[source]]
+name = "pypi"
+url = "https://mirrors.aliyun.com/pypi/simple"
+verify_ssl = true
+
+[dev-packages]
+faker = "*"
+
+[packages]
+flask = "*"
+flask-cors = "*"
+python-dotenv = "*"
+pymongo = "*"
+pyjwt = "*"
+
+[requires]
+python_version = "3.8"
