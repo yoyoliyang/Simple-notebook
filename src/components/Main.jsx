@@ -36,13 +36,15 @@ const Main = (props) => {
         // console.log('debug: Main', result)
         if (result.loginStatus) {
             setLoginStatus(true)
+        } else {
+            setLoginStatus(false)
         }
     }
 
     useEffect(() => {
         // console.log('debug: Main', cookies)
         checkToken()
-        // console.log('debug: Main', loginStatus)
+        console.log('debug: Main', loginStatus)
     })
 
 

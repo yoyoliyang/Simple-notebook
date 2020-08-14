@@ -55,7 +55,7 @@ const List = (props) => {
                             {blogList.map((item, index) => {
                                 return (
                                     <div className="blog-post" key={index} >
-                                        <h2 className="blog-post-title" ><Link to={"/blog/" + item._id}>{item.subject}</Link></h2>
+                                        <h2 className="blog-post-title" ><Link to={"/" + item._id}>{item.subject}</Link></h2>
                                         <p className="blog-post-meta">
                                             {item.timestamp}
                                         </p>

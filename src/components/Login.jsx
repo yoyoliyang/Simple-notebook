@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react"
+import React, { useState, useContext, useEffect, useCallback } from "react"
 import { useCookies } from "react-cookie"
 import { LoginTokenContext, LoginStatusContext } from "./LoginTokenContext"
 import { MainClass } from './Main'
@@ -30,14 +30,18 @@ const Login = (props) => {
         result = await result.json()
         if (result.loginStatus) {
             setLoginStatus(true)
-            props.history.push('/blog')
+            props.history.push('/')
         }
     }
 
+    // const callbackCheckToken = useCallback(() => {
+    //     checkToken()
+    // }, [checkToken])
 
     useEffect(() => {
         if (cookies.last_token) {
-            checkToken()}
+            checkToken()
+        }
     }, [cookies.last_token]) // 避免重复提交check_auth
 
     const handleEdit = (e) => {
@@ -64,7 +68,7 @@ const Login = (props) => {
             // 保存token到cookie
             setCookie('last_token', result.last_token, { path: '/' })
             setLoginStatus(true)
-            props.history.push('/blog')
+            props.history.push('/')
         } else {
             props.history.push('/login')
         }

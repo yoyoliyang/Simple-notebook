@@ -19,12 +19,11 @@ const App = () => {
         <LoginTokenProvider>
           <LoginStatusProvider>
             <Switch>
-              <Route exact path="/" component={List} />
               <Route exact path="/login" component={Login} />
               <Route exact path="/page" component={Page} />
               <Route exact path="/add" component={Add} />
-              <Route exact path="/blog" component={List} />
-              <Route exact path="/blog/:slug" component={View} />
+              <Route exact path="/" component={List} />
+              <Route exact path="/:slug" component={View} />
             </Switch>
             <Footer />
           </LoginStatusProvider>

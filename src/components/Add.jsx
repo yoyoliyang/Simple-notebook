@@ -35,7 +35,7 @@ const Add = (props) => {
     const handleSubmit = (e) => {
         // post添加后的数据
         fetchBlogDataApi()
-        props.history.push("/blog/" + blogData._id)
+        props.history.push("/" + blogData._id)
         e.preventDefault()
     }
 

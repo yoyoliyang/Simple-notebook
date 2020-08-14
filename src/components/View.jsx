@@ -4,6 +4,7 @@ import NotFound from './NotFound'
 import Main from "./Main"
 import Header from "./Header"
 import { useParams } from "react-router-dom"
+// import Prism from "prismjs"
 import ReactMarkdown from "react-markdown"
 
 // /blog
@@ -42,7 +43,7 @@ const View = (props) => {
     const handleDelete = (e) => {
         fetchDeleteBlogData()
         e.preventDefault()
-        props.history.push("/blog")
+        props.history.push("/")
     }
 
     const handleEdit = (b) => {
@@ -54,6 +55,7 @@ const View = (props) => {
     }
 
     useEffect(() => {
+        // Prism.highlightAll()
         fetchBlogData(slug)
         if (refetch) {
             console.log('reloading')
