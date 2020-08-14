@@ -14,6 +14,8 @@ const View = (props) => {
 
     const [blogData, setBlogData] = useState({})
     const [edit, setEdit] = useState(false)
+    // 用来更新父组件refetch，以便useEffect重新渲染
+    const [refetch, setRefetch] = useState(false)
     const [error, setError] = useState(false)
 
     const fetchBlogData = async (id) => {
@@ -47,9 +49,19 @@ const View = (props) => {
         setEdit(b)
     }
 
+    const handleRefetch = () => {
+        setRefetch(true)
+    }
+
     useEffect(() => {
         fetchBlogData(slug)
-    },[slug])
+        if (refetch) {
+            console.log('reloading')
+            // 改回原始state，以便下次重新刷新
+            setRefetch(false)
+            fetchBlogData(slug)
+        }
+    }, [refetch, slug])
 
     const Content = () => {
         return (
@@ -59,7 +71,7 @@ const View = (props) => {
                     {
                         edit ?
                             <Edit _id={blogData._id
-                            } timestamp={blogData.timestamp} subject={blogData.subject} data={blogData.data} action="update" handleView={handleEdit} fetchBlogData={fetchBlogData}/>
+                            } timestamp={blogData.timestamp} subject={blogData.subject} data={blogData.data} action="update" handleView={handleEdit} handleRefetch={handleRefetch} fetchBlogData={fetchBlogData} />
                             :
                             <>
                                 <h2 className="blog-post-title" >{blogData.subject}</h2>

@@ -30,9 +30,8 @@ const Edit = (props) => {
 
     const handleSubmit = (e) => {
         editBlogDataApi()
-        // 有待优化 , 重新提交后，父组件不能重新获取api内容，除非重新刷新页面
         props.handleView(false)
-        props.fetchBlogData(blogData._id)
+        props.handleRefetch()
         e.preventDefault()
     }
     return (

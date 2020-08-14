@@ -54,7 +54,7 @@ const Main = (props) => {
                 </MainClass>
                 :
                 <MainClass>
-                    <h3>error login token</h3>
+                    <h3>error login token(需要登陆或token过期)</h3>
                 </MainClass>
             }
         </>
