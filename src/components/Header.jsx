@@ -8,7 +8,6 @@ const Header = (props) => {
     const [loginStatus, setLoginStatus] = useContext(LoginStatusContext)
     const [cookies, removeCookie] = useCookies('last_token')
 
-    // console.log('Header debug:',loginStatus)
     const handleLogout = () => {
         removeCookie('last_token')
         setLoginStatus(false)
@@ -25,7 +24,7 @@ const Header = (props) => {
                     <div className="col-4 d-flex justify-content-end align-items-center">
                             {loginStatus ?
                                 <>
-                                    <Link className="btn btn-sm text-primary" to="/add">Add</Link>
+                                    <Link className="btn btn-sm text-primary" to="/add" >Add</Link>
                                     <button className="btn btn-sm btn-outline-secondary" onClick={handleLogout} >Logout</button>
                                 </>
                                 :

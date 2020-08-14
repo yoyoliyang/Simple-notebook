@@ -33,7 +33,6 @@ const Main = (props) => {
             })
         })
         result = await result.json()
-        // console.log('debug: Main', result)
         if (result.loginStatus) {
             setLoginStatus(true)
         } else {
@@ -42,9 +41,7 @@ const Main = (props) => {
     }
 
     useEffect(() => {
-        // console.log('debug: Main', cookies)
         checkToken()
-        console.log('debug: Main', loginStatus)
     })
 
 

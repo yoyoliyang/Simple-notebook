@@ -3,7 +3,7 @@ import SideBar from './SideBar'
 import Header from './Header'
 import Main from './Main'
 import { Link } from "react-router-dom"
-import ReactMarkdown from "react-markdown"
+import Md from "./tools/Markdown"
 
 const List = (props) => {
 
@@ -59,7 +59,7 @@ const List = (props) => {
                                         <p className="blog-post-meta">
                                             {item.timestamp}
                                         </p>
-                                        <ReactMarkdown source={item.data} />
+                                        <Md source={item.data} />
                                     </div>
                                 )
                             })}

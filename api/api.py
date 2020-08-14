@@ -8,10 +8,28 @@ import time
 # 调试使用
 from flask_cors import CORS
 from bson.json_util import dumps
+from functools import wraps
 
 
 app = Flask(__name__, static_folder="../build", static_url_path="/")
 CORS(app)
+
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.get_json('token')
+        token = token.get('token')
+        print(token)
+        if not token:
+            return {'error': 'Token is missing!'}, 403
+        try:
+            jwt.decode(token, os.getenv('SECRET_KEY'))
+        except jwt.exceptions.DecodeError:
+            return {'error': 'Token is invalid!'}, 403
+
+        return f(*args, **kwargs)
+    return decorated
 
 
 @app.route('/api/user', methods=['POST', 'GET'])
@@ -46,22 +64,18 @@ def check_token():
         request_data = request.get_json()
         token = request_data.get('last_token')
         print(token)
-        try:
-            with MongoClient(os.getenv('MONGO_URI')) as c:
-                user = c.simpleBlog.user
-                if user.find_one({'last_token': token}):
-                    return {'loginStatus': True}
-                else:
-                    return {'error': 'error login status'}, 400
-        except jwt.exceptions.DecodeError:
-            return {'error': 'error login status'}, 400
-        else:
-            return {'error': 'error login status'}, 400
+        with MongoClient(os.getenv('MONGO_URI')) as c:
+            user = c.simpleBlog.user
+            if user.find_one({'last_token': token}):
+                return {'loginStatus': True}
+            else:
+                return {'error': 'error login status'}, 403
     return {'info': 'token check api'}
 
 
 @ app.route('/api/blog/<uuid:id>')
 def blog_id(id):
+
     with MongoClient(os.getenv('MONGO_URI')) as c:
         blog = c.simpleBlog.blog
         result = blog.find_one({'_id': str(id)})
@@ -116,6 +130,7 @@ def blog_last(last):
 
 # add or update
 @ app.route('/api/blog/<string:action>', methods=['POST', 'GET'])
+@token_required
 def blog_add(action):
     if request.method == "POST" and (action == "add" or action == "update"):
         request_data = request.get_json()
@@ -144,7 +159,6 @@ def blog_add(action):
                     }
         else:
             return {'error': 'error request'}, 400
-
     return {'info': 'blog add api'}
 
 

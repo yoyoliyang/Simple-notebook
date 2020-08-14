@@ -4,12 +4,13 @@ import NotFound from './NotFound'
 import Main from "./Main"
 import Header from "./Header"
 import { useParams } from "react-router-dom"
-// import Prism from "prismjs"
-import ReactMarkdown from "react-markdown"
+import Md from "./tools/Markdown"
+import { useCookies } from "react-cookie"
 
 // /blog
 const View = (props) => {
 
+    const [cookies, removeCookie] = useCookies('last_token')
     const blogDataApi = "http://127.0.0.1:5000/api/blog/"
     let { slug } = useParams()
 
@@ -32,7 +33,8 @@ const View = (props) => {
         await fetch(blogDataApi + 'del', {
             method: 'POST',
             body: JSON.stringify({
-                _id: blogData._id
+                _id: blogData._id,
+                token: cookies.last_token 
             }),
             headers: new Headers({
                 'Content-Type': 'application/json'
@@ -55,7 +57,6 @@ const View = (props) => {
     }
 
     useEffect(() => {
-        // Prism.highlightAll()
         fetchBlogData(slug)
         if (refetch) {
             console.log('reloading')
@@ -82,7 +83,7 @@ const View = (props) => {
                                     <span><button className="btn btn-primary btn-sm" onClick={() => handleEdit(true)}>编辑</button></span>
                                     <span><button className="btn btn-sm text-danger" onClick={(e) => handleDelete(e)}>删除</button></span>
                                 </p>
-                                <ReactMarkdown source={blogData.data} />
+                                <Md source={blogData.data} />
                             </>}
                 </Main>
             </>

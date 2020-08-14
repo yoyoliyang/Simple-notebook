@@ -2,10 +2,11 @@ import React, { useState, } from "react"
 import Main from "./Main"
 import Header from "./Header"
 import { v4 as uuid4 } from 'uuid'
-
+import { useCookies } from "react-cookie"
 
 const Add = (props) => {
 
+    const [cookies, removeCookie] = useCookies('last_token')
     const _id = uuid4()
     const blogDataApi = "http://127.0.0.1:5000/api/blog/"
 
@@ -13,7 +14,8 @@ const Add = (props) => {
         _id: _id,
         subject: '',
         timestamp: new Date().toLocaleString(),
-        data: ''
+        data: '',
+        token: cookies.last_token
     })
 
     const handleEdit = (e) => {
