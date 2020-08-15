@@ -1,14 +1,12 @@
-import React  from 'react'
-import Main from './Main'
-import Header from './Header'
+import React from 'react'
+import { MainClass } from './tools/Class'
 
 const NotFound = () => {
     return (
         <>
-        <Header />
-        <Main>
-            <h1>Not Found</h1>
-        </Main>
+            <MainClass>
+                <h1>Not Found</h1>
+            </MainClass>
         </>
     )
 }

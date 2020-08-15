@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React, { useContext, useEffect } from "react"
 import { Link, withRouter } from "react-router-dom"
 import { LoginStatusContext } from "./LoginTokenContext"
 import { useCookies } from "react-cookie"
@@ -6,13 +6,39 @@ import { useCookies } from "react-cookie"
 const Header = (props) => {
 
     const [loginStatus, setLoginStatus] = useContext(LoginStatusContext)
-    const [cookies, removeCookie] = useCookies('last_token')
+    const [cookies, removeCookie] = useCookies('token')
 
     const handleLogout = () => {
-        removeCookie('last_token')
+        removeCookie('token')
         setLoginStatus(false)
         props.history.push('/login')
     }
+
+    const tokenApi = 'http://127.0.0.1:5000/api/check_token'
+    const checkToken = async () => {
+        let result = await fetch(tokenApi, {
+            method: 'POST',
+            body: JSON.stringify(cookies),
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            })
+        })
+        result = await result.json()
+        console.log(result)
+        if (result.message === 'success') {
+            setLoginStatus(true)
+        } else {
+            setLoginStatus(false)
+        }
+    }
+
+    useEffect(() => {
+        if (cookies.token === undefined) {
+            setLoginStatus(false)
+        } else {
+            checkToken()
+        }
+    }, [cookies.token])
 
     return (
         <div className="container">
@@ -22,14 +48,14 @@ const Header = (props) => {
                         <Link className="blog-header-logo text-dark" to="/">Simple notebook</Link>
                     </div>
                     <div className="col-4 d-flex justify-content-end align-items-center">
-                            {loginStatus ?
-                                <>
-                                    <Link className="btn btn-sm text-primary" to="/add" >Add</Link>
-                                    <button className="btn btn-sm btn-outline-secondary" onClick={handleLogout} >Logout</button>
-                                </>
-                                :
-                                <Link className="btn btn-sm btn-outline-secondary" to="/login">Login</Link>
-                            }
+                        {loginStatus ?
+                            <>
+                                <Link className="btn btn-sm text-primary" to="/add" >Add</Link>
+                                <button className="btn btn-sm btn-outline-secondary" onClick={handleLogout} >Logout</button>
+                            </>
+                            :
+                            <Link className="btn btn-sm btn-outline-secondary" to="/login">Login</Link>
+                        }
                     </div>
                 </div>
             </header>

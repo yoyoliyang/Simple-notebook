@@ -1,10 +1,10 @@
 import os
 # 向上取整函数
 from math import ceil
+import time
 from pymongo import MongoClient
 from flask import Flask, request
 import jwt
-import time
 # 调试使用
 from flask_cors import CORS
 from bson.json_util import dumps
@@ -18,15 +18,16 @@ CORS(app)
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.get_json('token')
-        token = token.get('token')
+        data = request.get_json('token')
+        print('debug_data: ', '-'*10, data)
+        token = data.get('token')
         print(token)
         if not token:
-            return {'error': 'Token is missing!'}, 403
+            return {'error': 'Token is missing!'}
         try:
             jwt.decode(token, os.getenv('SECRET_KEY'))
         except jwt.exceptions.DecodeError:
-            return {'error': 'Token is invalid!'}, 403
+            return {'error': 'Token is invalid!'}
 
         return f(*args, **kwargs)
     return decorated
@@ -42,16 +43,17 @@ def user():
             username = request_data.get('username')
             password = request_data.get('password')
             if user.find_one({"username": username, "password": password}):
-                token = jwt.encode({'username': username, 'time': time.time()}, os.getenv(
+                # 生成token并设定到期日+30min
+                token = jwt.encode({'username': username, 'exp': ceil(time.time())+1800}, os.getenv(
                     'SECRET_KEY'), algorithm='HS256')
                 token = token.decode('utf-8')
                 print(token, username, password)
                 user.find_one_and_update(
                     {"username": username},
-                    {'$set': {'last_token': token}}
+                    {'$set': {'token': token}}
                 )
                 return {
-                    'info': 'login successful', 'last_token': token, 'username': username
+                    'info': 'login successful', 'token': token, 'username': username
                 }
             else:
                 return {'info': 'login failed'}
@@ -59,18 +61,10 @@ def user():
 
 
 @ app.route('/api/check_token', methods=['POST', 'GET'])
+# token检测
+@token_required
 def check_token():
-    if request.method == 'POST':
-        request_data = request.get_json()
-        token = request_data.get('last_token')
-        print(token)
-        with MongoClient(os.getenv('MONGO_URI')) as c:
-            user = c.simpleBlog.user
-            if user.find_one({'last_token': token}):
-                return {'loginStatus': True}
-            else:
-                return {'error': 'error login status'}, 403
-    return {'info': 'token check api'}
+    return {'message': 'success'}
 
 
 @ app.route('/api/blog/<uuid:id>')
@@ -163,6 +157,7 @@ def blog_add(action):
 
 
 @ app.route('/api/blog/del', methods=['POST', 'GET'])
+@token_required
 def blog_delete():
     if request.method == "POST":
         request_data = request.get_json()

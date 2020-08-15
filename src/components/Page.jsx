@@ -1,8 +1,8 @@
 import React from 'react'
-import Main from "./Main"
+import {MainClass} from "./tools/Class"
 
 export default function Page() {
     return (
-        <Main>Page</Main>
+        <MainClass>Page</MainClass>
     )
 }

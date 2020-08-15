@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react"
 import SideBar from './SideBar'
-import Header from './Header'
-import Main from './Main'
 import { Link } from "react-router-dom"
 import Md from "./tools/Markdown"
 
@@ -47,31 +45,28 @@ const List = (props) => {
 
     return (
         <>
-            <Header />
-            <Main>
-                <main role="main" className="container">
-                    <div className="row">
-                        <div className="col-md-8 blog-main">
-                            {blogList.map((item, index) => {
-                                return (
-                                    <div className="blog-post" key={index} >
-                                        <h2 className="blog-post-title" ><Link to={"/" + item._id}>{item.subject}</Link></h2>
-                                        <p className="blog-post-meta">
-                                            {item.timestamp}
-                                        </p>
-                                        <Md source={item.data} />
-                                    </div>
-                                )
-                            })}
-                            <div className="blog-pagination">
-                                <button className="btn btn-outline-primary" disabled={page === 1 ? 'disabled' : ''} onClick={handlePrevious}>Previous</button>
-                                <button className="btn btn-outline-secondary" disabled={page === lastPage ? 'disabled' : ''} onClick={handleNext}>Next</button>
-                            </div>
+            <main role="main" className="container">
+                <div className="row">
+                    <div className="col-md-8 blog-main">
+                        {blogList.map((item, index) => {
+                            return (
+                                <div className="blog-post" key={index} >
+                                    <h2 className="blog-post-title" ><Link to={"/" + item._id}>{item.subject}</Link></h2>
+                                    <p className="blog-post-meta">
+                                        {item.timestamp}
+                                    </p>
+                                    <Md source={item.data} />
+                                </div>
+                            )
+                        })}
+                        <div className="blog-pagination">
+                            <button className="btn btn-outline-primary" disabled={page === 1 ? 'disabled' : ''} onClick={handlePrevious}>Previous</button>
+                            <button className="btn btn-outline-secondary" disabled={page === lastPage ? 'disabled' : ''} onClick={handleNext}>Next</button>
                         </div>
-                        <SideBar />
                     </div>
-                </main>
-            </Main>
+                    <SideBar />
+                </div>
+            </main>
         </>
     )
 }

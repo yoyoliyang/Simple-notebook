@@ -1,16 +1,17 @@
 import React, { useState, useEffect, useContext } from 'react'
 import Edit from "./Edit"
 import NotFound from './NotFound'
-import Main from "./Main"
-import Header from "./Header"
+import { MainClass } from "./tools/Class"
 import { useParams } from "react-router-dom"
 import Md from "./tools/Markdown"
 import { useCookies } from "react-cookie"
+import { LoginStatusContext } from "./LoginTokenContext"
 
 // /blog
 const View = (props) => {
 
-    const [cookies, removeCookie] = useCookies('last_token')
+    const [cookies, removeCookie] = useCookies('token')
+    const [loginStatus, setLoginStatus] = useContext(LoginStatusContext)
     const blogDataApi = "http://127.0.0.1:5000/api/blog/"
     let { slug } = useParams()
 
@@ -34,7 +35,7 @@ const View = (props) => {
             method: 'POST',
             body: JSON.stringify({
                 _id: blogData._id,
-                token: cookies.last_token 
+                token: cookies.token
             }),
             headers: new Headers({
                 'Content-Type': 'application/json'
@@ -69,8 +70,7 @@ const View = (props) => {
     const Content = () => {
         return (
             <>
-                <Header />
-                <Main>
+                <MainClass>
                     {
                         edit ?
                             <Edit _id={blogData._id
@@ -80,12 +80,17 @@ const View = (props) => {
                                 <h2 className="blog-post-title" >{blogData.subject}</h2>
                                 <p className="blog-post-meta">
                                     {blogData.timestamp}
-                                    <span><button className="btn btn-primary btn-sm" onClick={() => handleEdit(true)}>编辑</button></span>
-                                    <span><button className="btn btn-sm text-danger" onClick={(e) => handleDelete(e)}>删除</button></span>
+                                    {loginStatus ?
+                                        <>
+                                            <span><button className="btn btn-primary btn-sm" onClick={() => handleEdit(true)}>编辑</button></span>
+                                            <span><button className="btn btn-sm text-danger" onClick={(e) => handleDelete(e)}>删除</button></span>
+                                        </>
+                                        : ''
+                                    }
                                 </p>
                                 <Md source={blogData.data} />
                             </>}
-                </Main>
+                </MainClass>
             </>
         )
     }

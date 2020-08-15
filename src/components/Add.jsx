@@ -1,12 +1,14 @@
-import React, { useState, } from "react"
-import Main from "./Main"
-import Header from "./Header"
+import React, { useState, useContext } from "react"
+import { MainClass } from "./tools/Class"
+import NotFound from "./NotFound"
 import { v4 as uuid4 } from 'uuid'
 import { useCookies } from "react-cookie"
+import {LoginStatusContext} from "./LoginTokenContext"
 
 const Add = (props) => {
 
-    const [cookies, removeCookie] = useCookies('last_token')
+    const [loginStatus, setLoginStatus] = useContext(LoginStatusContext)
+    const [cookies, removeCookie] = useCookies('token')
     const _id = uuid4()
     const blogDataApi = "http://127.0.0.1:5000/api/blog/"
 
@@ -15,7 +17,7 @@ const Add = (props) => {
         subject: '',
         timestamp: new Date().toLocaleString(),
         data: '',
-        token: cookies.last_token
+        token: cookies.token
     })
 
     const handleEdit = (e) => {
@@ -45,8 +47,8 @@ const Add = (props) => {
 
     return (
         <>
-            <Header />
-            <Main>
+        { loginStatus ?
+            <MainClass>
                 <form>
                     <div className="form-group">
                         <label htmlFor="subject" />
@@ -59,7 +61,10 @@ const Add = (props) => {
                     <button type="submit" className="btn btn-primary" onClick={handleSubmit}>Submit</button>
                     <button className="btn btn-sm" onClick={() => props.history.push("/")}>Cancel</button>
                 </form>
-            </Main>
+            </MainClass>
+            :
+            <NotFound /> 
+        }
         </>
     )
 }

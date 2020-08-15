@@ -1,14 +1,13 @@
-import React, { useState, useContext, useEffect, useCallback } from "react"
+import React, { useState, useContext, useEffect  } from "react"
 import { useCookies } from "react-cookie"
 import { LoginTokenContext, LoginStatusContext } from "./LoginTokenContext"
-import { MainClass } from './Main'
-import Header from './Header'
+import { MainClass } from './tools/Class'
 
 const Login = (props) => {
     const [token, setToken] = useContext(LoginTokenContext)
     const [loginStatus, setLoginStatus] = useContext(LoginStatusContext)
 
-    const [cookies, setCookie] = useCookies('last_token')
+    const [cookies, setCookie] = useCookies('token')
 
     const userApi = "http://127.0.0.1:5000/api/user"
 
@@ -17,32 +16,12 @@ const Login = (props) => {
         password: ''
     })
 
-
-    const tokenApi = 'http://127.0.0.1:5000/api/check_token'
-    const checkToken = async () => {
-        let result = await fetch(tokenApi, {
-            method: 'POST',
-            body: JSON.stringify(cookies),
-            headers: new Headers({
-                'Content-Type': 'application/json'
-            })
-        })
-        result = await result.json()
-        if (result.loginStatus) {
-            setLoginStatus(true)
+    useEffect(() => {
+        console.log(loginStatus)
+        if (loginStatus) {
             props.history.push('/')
         }
-    }
-
-    // const callbackCheckToken = useCallback(() => {
-    //     checkToken()
-    // }, [checkToken])
-
-    useEffect(() => {
-        if (cookies.last_token) {
-            checkToken()
-        }
-    }, [cookies.last_token]) // 避免重复提交check_auth
+    }, [loginStatus, props.history])
 
     const handleEdit = (e) => {
         setLoginData({
@@ -60,13 +39,13 @@ const Login = (props) => {
             })
         })
         result = await result.json()
-        if (result.last_token) {
+        if (result.token) {
             setToken({
-                last_token: result.last_token,
+                token: result.token,
                 username: result.username
             })
             // 保存token到cookie
-            setCookie('last_token', result.last_token, { path: '/' })
+            setCookie('token', result.token, { path: '/' })
             setLoginStatus(true)
             props.history.push('/')
         } else {
@@ -82,7 +61,6 @@ const Login = (props) => {
 
     return (
         <>
-            <Header />
             <MainClass>
                 <form className="form-signin" onSubmit={(e) => handleSubmit(e)}>
                     <div className="form-group">
