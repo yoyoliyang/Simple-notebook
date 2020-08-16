@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect  } from "react"
+import React, { useState, useContext, useEffect } from "react"
 import { useCookies } from "react-cookie"
 import { LoginTokenContext, LoginStatusContext } from "./LoginTokenContext"
 import { MainClass } from './tools/Class'
@@ -46,7 +46,8 @@ const Login = (props) => {
             // 保存token到cookie
             setCookie('token', result.token, { path: '/' })
             setLoginStatus(true)
-            props.history.push('/')
+            // props.history.push('/')
+            props.history.goBack()
         } else {
             props.history.push('/login')
         }

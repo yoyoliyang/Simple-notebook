@@ -7,7 +7,6 @@ const Header = (props) => {
 
     const [loginStatus, setLoginStatus] = useContext(LoginStatusContext)
     const [cookies, removeCookie] = useCookies('token')
-    const [error, setError] = useState(false)
 
     const handleLogout = () => {
         removeCookie('token')
@@ -31,9 +30,8 @@ const Header = (props) => {
             setLoginStatus(true)
         } else {
             setLoginStatus(false)
-            setError(true)
         }
-    }, [cookies, setLoginStatus, error])
+    }, [cookies, setLoginStatus])
 
 
     useEffect(() => {
@@ -59,10 +57,7 @@ const Header = (props) => {
                             </>
                             :
                             <>
-                                {error ?
-                                    <span className="text-danger mr-1">token已过期，重新登录</span>:''
-                                }
-                                <Link className="btn btn-sm btn-outline-secondary" to="/login">Login</Link>
+                                <Link className="btn btn-sm btn-outline-secondary" to="/login" >Login</Link>
                             </>
                         }
                     </div>
