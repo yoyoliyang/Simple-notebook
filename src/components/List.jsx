@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useCallback } from "react"
 import SideBar from './SideBar'
 import { Link } from "react-router-dom"
 import Md from "./tools/Markdown"
@@ -10,7 +10,7 @@ const List = (props) => {
     const [lastPage, setLastPage] = useState(1)
     const blogListApi = 'http://127.0.0.1:5000/api/blog/'
 
-    const fetchBlogList = async (count) => {
+    const fetchBlogList = useCallback(async (count) => {
         if (count) {
             let listData = await fetch(blogListApi + 'last?page=' + count)
             listData = await listData.json()
@@ -22,7 +22,7 @@ const List = (props) => {
         else {
             fetchBlogList(1)
         }
-    }
+    },[props.history])
 
     const handleNext = () => {
         fetchBlogList(page + 1)
@@ -40,8 +40,12 @@ const List = (props) => {
 
     useEffect(() => {
         page === 1 ? fetchBlogList() : fetchBlogList(page)
+        // fetchLastPageNumber()
+    }, [page, fetchBlogList])
+
+    useEffect(()=>{
         fetchLastPageNumber()
-    }, [page])
+    })
 
     return (
         <>
@@ -53,7 +57,8 @@ const List = (props) => {
                                 <div className="blog-post" key={index} >
                                     <h2 className="blog-post-title" ><Link to={"/" + item._id}>{item.subject}</Link></h2>
                                     <p className="blog-post-meta">
-                                        {item.timestamp}
+                                        {/* 此处将item中的时间戳转化为可读模式 */}
+                                        {new Date(item.timestamp).toLocaleString()}
                                     </p>
                                     <Md source={item.data} />
                                 </div>

@@ -3,7 +3,7 @@ import { MainClass } from "./tools/Class"
 import NotFound from "./NotFound"
 import { v4 as uuid4 } from 'uuid'
 import { useCookies } from "react-cookie"
-import {LoginStatusContext} from "./LoginTokenContext"
+import { LoginStatusContext } from "./LoginTokenContext"
 
 const Add = (props) => {
 
@@ -15,7 +15,7 @@ const Add = (props) => {
     const [blogData, setBlogData] = useState({
         _id: _id,
         subject: '',
-        timestamp: new Date().toLocaleString(),
+        timestamp: Date.now(),
         data: '',
         token: cookies.token
     })
@@ -47,24 +47,24 @@ const Add = (props) => {
 
     return (
         <>
-        { loginStatus ?
-            <MainClass>
-                <form>
-                    <div className="form-group">
-                        <label htmlFor="subject" />
-                        <input className="form-control" name="subject" value={blogData.subject} onChange={handleEdit} placeholder="标题" />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="data" />
-                        <textarea rows="10" className="form-control" name="data" value={blogData.data} onChange={handleEdit} placeholder="内容(支持markdown)" />
-                    </div>
-                    <button type="submit" className="btn btn-primary" onClick={handleSubmit}>Submit</button>
-                    <button className="btn btn-sm" onClick={() => props.history.push("/")}>Cancel</button>
-                </form>
-            </MainClass>
-            :
-            <NotFound /> 
-        }
+            {loginStatus ?
+                <MainClass>
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label htmlFor="subject" />
+                            <input className="form-control" name="subject" value={blogData.subject} onChange={handleEdit} placeholder="标题" required />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="data" />
+                            <textarea rows="10" className="form-control" name="data" value={blogData.data} onChange={handleEdit} placeholder="内容(支持markdown)" required />
+                        </div>
+                        <button type="submit" className="btn btn-primary" >Submit</button>
+                        <button className="btn btn-sm" onClick={() => props.history.push("/")}>Cancel</button>
+                    </form>
+                </MainClass>
+                :
+                <NotFound />
+            }
         </>
     )
 }

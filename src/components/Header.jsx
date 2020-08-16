@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react"
+import React, { useContext, useEffect, useState, useCallback } from "react"
 import { Link, withRouter } from "react-router-dom"
 import { LoginStatusContext } from "./LoginTokenContext"
 import { useCookies } from "react-cookie"
@@ -7,6 +7,7 @@ const Header = (props) => {
 
     const [loginStatus, setLoginStatus] = useContext(LoginStatusContext)
     const [cookies, removeCookie] = useCookies('token')
+    const [error, setError] = useState(false)
 
     const handleLogout = () => {
         removeCookie('token')
@@ -15,7 +16,8 @@ const Header = (props) => {
     }
 
     const tokenApi = 'http://127.0.0.1:5000/api/check_token'
-    const checkToken = async () => {
+    const checkToken = useCallback(async () => {
+        // api post数据并返回erorr
         let result = await fetch(tokenApi, {
             method: 'POST',
             body: JSON.stringify(cookies),
@@ -24,13 +26,15 @@ const Header = (props) => {
             })
         })
         result = await result.json()
-        console.log(result)
+        console.log('Debug: Header-', result)
         if (result.message === 'success') {
             setLoginStatus(true)
         } else {
             setLoginStatus(false)
+            setError(true)
         }
-    }
+    }, [cookies, setLoginStatus, error])
+
 
     useEffect(() => {
         if (cookies.token === undefined) {
@@ -38,7 +42,7 @@ const Header = (props) => {
         } else {
             checkToken()
         }
-    }, [cookies.token])
+    }, [cookies.token, checkToken, setLoginStatus])
 
     return (
         <div className="container">
@@ -54,7 +58,12 @@ const Header = (props) => {
                                 <button className="btn btn-sm btn-outline-secondary" onClick={handleLogout} >Logout</button>
                             </>
                             :
-                            <Link className="btn btn-sm btn-outline-secondary" to="/login">Login</Link>
+                            <>
+                                {error ?
+                                    <span className="text-danger mr-1">token已过期，重新登录</span>:''
+                                }
+                                <Link className="btn btn-sm btn-outline-secondary" to="/login">Login</Link>
+                            </>
                         }
                     </div>
                 </div>

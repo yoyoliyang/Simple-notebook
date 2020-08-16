@@ -58,7 +58,6 @@ const View = (props) => {
     }
 
     useEffect(() => {
-        fetchBlogData(slug)
         if (refetch) {
             console.log('reloading')
             // 改回原始state，以便下次重新刷新
@@ -67,6 +66,10 @@ const View = (props) => {
         }
     }, [refetch, slug])
 
+    useEffect(()=>{
+        fetchBlogData(slug)
+    },[slug])
+
     const Content = () => {
         return (
             <>
@@ -74,12 +77,12 @@ const View = (props) => {
                     {
                         edit ?
                             <Edit _id={blogData._id
-                            } timestamp={blogData.timestamp} subject={blogData.subject} data={blogData.data} action="update" handleView={handleEdit} handleRefetch={handleRefetch} fetchBlogData={fetchBlogData} />
+                            } timestamp={blogData.timestamp} subject={blogData.subject} data={blogData.data} handleView={handleEdit} handleRefetch={handleRefetch} fetchBlogData={fetchBlogData} />
                             :
                             <>
                                 <h2 className="blog-post-title" >{blogData.subject}</h2>
                                 <p className="blog-post-meta">
-                                    {blogData.timestamp}
+                                    {new Date(blogData.timestamp).toLocaleString()}
                                     {loginStatus ?
                                         <>
                                             <span><button className="btn btn-primary btn-sm" onClick={() => handleEdit(true)}>编辑</button></span>

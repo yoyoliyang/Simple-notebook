@@ -17,7 +17,6 @@ const Login = (props) => {
     })
 
     useEffect(() => {
-        console.log(loginStatus)
         if (loginStatus) {
             props.history.push('/')
         }

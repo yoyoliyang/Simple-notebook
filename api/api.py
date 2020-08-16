@@ -15,19 +15,26 @@ app = Flask(__name__, static_folder="../build", static_url_path="/")
 CORS(app)
 
 
+def log_color(s):
+    CRED = '\033[91m'
+    CEND = '\033[0m'
+    return CRED+s+CEND
+
+
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         data = request.get_json('token')
-        print('debug_data: ', '-'*10, data)
         token = data.get('token')
-        print(token)
         if not token:
-            return {'error': 'Token is missing!'}
+            print(log_color('debug:(token_required):Token is missing!'))
+            return {'error': 'Token is missing!'}, 403
         try:
             jwt.decode(token, os.getenv('SECRET_KEY'))
         except jwt.exceptions.DecodeError:
-            return {'error': 'Token is invalid!'}
+            return {'error': 'Token is invalid!'}, 403
+        except jwt.exceptions.ExpiredSignatureError:
+            return {'error': 'Token is expired!'}, 403
 
         return f(*args, **kwargs)
     return decorated
@@ -37,14 +44,13 @@ def token_required(f):
 def user():
     if request.method == 'POST':
         request_data = request.get_json()
-        print(request_data)
         with MongoClient(os.getenv('MONGO_URI')) as c:
             user = c.simpleBlog.user
             username = request_data.get('username')
             password = request_data.get('password')
             if user.find_one({"username": username, "password": password}):
-                # 生成token并设定到期日+30min
-                token = jwt.encode({'username': username, 'exp': ceil(time.time())+1800}, os.getenv(
+                # 生成token并设定到期日+8hour
+                token = jwt.encode({'username': username, 'exp': ceil(time.time()) + 28800}, os.getenv(
                     'SECRET_KEY'), algorithm='HS256')
                 token = token.decode('utf-8')
                 print(token, username, password)
@@ -69,11 +75,10 @@ def check_token():
 
 @ app.route('/api/blog/<uuid:id>')
 def blog_id(id):
-
     with MongoClient(os.getenv('MONGO_URI')) as c:
         blog = c.simpleBlog.blog
         result = blog.find_one({'_id': str(id)})
-        print(result)
+        print('debug: blog_id-', result)
         if result:
             return result
         else:
@@ -146,7 +151,7 @@ def blog_add(action):
                     blog.find_one_and_update(
                         {"_id": request_data.get('_id')},
                         {'$set': {'subject': request_data.get(
-                            'subject'), 'data': request_data.get('data')}}
+                            'subject'), 'timestamp': request_data.get('timestamp'), 'data': request_data.get('data')}}
                     )
                     return {
                         'info': 'successfully updated'
@@ -157,7 +162,7 @@ def blog_add(action):
 
 
 @ app.route('/api/blog/del', methods=['POST', 'GET'])
-@token_required
+@ token_required
 def blog_delete():
     if request.method == "POST":
         request_data = request.get_json()
