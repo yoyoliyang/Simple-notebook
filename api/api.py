@@ -2,8 +2,10 @@ import os
 # 向上取整函数
 from math import ceil
 import time
+import click
 from pymongo import MongoClient
 from flask import Flask, request
+from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 # 调试使用
 from flask_cors import CORS
@@ -15,10 +17,25 @@ app = Flask(__name__, static_folder="../build", static_url_path="/")
 CORS(app)
 
 
+# debug调试输出颜色
 def log_color(s):
     CRED = '\033[91m'
     CEND = '\033[0m'
     return CRED+s+CEND
+
+# 重置管理员
+
+
+@app.cli.command('reset-user')
+def reset_user():
+    """reset user to default(admin,admin)"""
+    with MongoClient(os.getenv('MONGO_URI')) as c:
+        user = c.simpleBlog.user
+        user.find_one_and_delete({'user': 'admin'})
+        user.insert_one({
+            'username': 'admin',
+            'password': generate_password_hash('admin')
+        })
 
 
 def token_required(f):
@@ -48,27 +65,33 @@ def user():
             user = c.simpleBlog.user
             username = request_data.get('username')
             password = request_data.get('password')
-            if user.find_one({"username": username, "password": password}):
-                # 生成token并设定到期日+8hour
-                token = jwt.encode({'username': username, 'exp': ceil(time.time()) + 28800}, os.getenv(
-                    'SECRET_KEY'), algorithm='HS256')
-                token = token.decode('utf-8')
-                print(token, username, password)
-                user.find_one_and_update(
-                    {"username": username},
-                    {'$set': {'token': token}}
-                )
-                return {
-                    'info': 'login successful', 'token': token, 'username': username
-                }
+            result = user.find_one({"username": username})
+            if result:
+                password_hash = result.get('password')
+                if check_password_hash(password_hash, password):
+                    # 生成token并设定到期日+8hour
+                    token = jwt.encode({'username': username, 'exp': ceil(time.time()) + 28800}, os.getenv(
+                        'SECRET_KEY'), algorithm='HS256')
+                    token = token.decode('utf-8')
+                    user.find_one_and_update(
+                        {"username": username},
+                        {'$set': {'token': token}}
+                    )
+                    return {
+                        'info': 'login successful', 'token': token, 'username': username
+                    }
+                else:
+                    return {
+                        'info': 'error username or password'
+                    }
             else:
-                return {'info': 'login failed'}
+                return {'info': 'error username or password'}
     return {'info': 'user api'}
 
 
 @ app.route('/api/check_token', methods=['POST', 'GET'])
 # token检测
-@token_required
+@ token_required
 def check_token():
     return {'message': 'success'}
 
@@ -86,6 +109,25 @@ def blog_id(id):
     return {'info': 'blog view api'}
 
 
+@ app.route('/api/search')
+def search():
+    # search api
+    with MongoClient(os.getenv('MONGO_URI')) as c:
+        blog = c.simpleBlog.blog
+        if 'keyword' in request.args:
+            keyword = request.args.get('keyword')
+            result = blog.find()
+            result = list(result)
+            search_result = {}
+            for index, item in enumerate(result):
+                if keyword in item.get('subject') or keyword in item.get('data'):
+                    print(item)
+                    search_result.update(item)
+                    print(search_result)
+            return search_result
+    return {'info': 'blog search api'}
+
+
 @ app.route('/api/blog/<string:last>')
 def blog_last(last):
     with MongoClient(os.getenv('MONGO_URI')) as c:
@@ -96,9 +138,8 @@ def blog_last(last):
         # /api/blog/last?index=number
         if last == "last" and 'index' in request.args:
             index = request.args.get('index')
-            print(index)
-            # 按_id排序
-            result = blog.find(limit=int(index)).sort("timestamp", 1)
+            # 按_id排序,-1为降序
+            result = blog.find(limit=int(index)).sort("timestamp", -1)
             if result:
                 return dumps(result)
             else:
@@ -117,7 +158,7 @@ def blog_last(last):
             else:
                 # skip跳过页面
                 result = blog.find(
-                    limit=10, skip=req_page_num-1).sort("timestamp", 1)
+                    limit=10, skip=req_page_num-1).sort("timestamp", -1)
                 if result:
                     return dumps(result)
                 else:
@@ -129,7 +170,7 @@ def blog_last(last):
 
 # add or update
 @ app.route('/api/blog/<string:action>', methods=['POST', 'GET'])
-@token_required
+@ token_required
 def blog_add(action):
     if request.method == "POST" and (action == "add" or action == "update"):
         request_data = request.get_json()
