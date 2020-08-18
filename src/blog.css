@@ -143,25 +143,3 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0 auto;
 }
 
-.blog-post-title-loading {
-  display: block;
-  background-color: lightgray;
-  width: 500px;
-  height: 28px;
-  margin-bottom: 3px;
-}
-.blog-post-meta-loading {
-  display: block;
-  background-color: lightgray;
-  width: 180px;
-  height: 24px;
-  margin-bottom: 3px;
-}
-.blog-post-data-loading {
-  display: block;
-  background-color: lightgray;
-  width: 500px;
-  height: 100px;
-  margin-bottom: 3px;
-}
-
