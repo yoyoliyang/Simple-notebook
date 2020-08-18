@@ -6,7 +6,6 @@ import { MainClass } from './tools/Class'
 const Login = (props) => {
     const [token, setToken] = useContext(LoginTokenContext)
     const [loginStatus, setLoginStatus] = useContext(LoginStatusContext)
-
     const [cookies, setCookie] = useCookies('token')
 
     const userApi = "http://192.168.1.123:5000/api/user"
@@ -16,8 +15,9 @@ const Login = (props) => {
         password: ''
     })
 
-    // 登录错误信息state
-    const [apiInfo, setApiInfo] = useState('')
+    // 登录错误信息state,此处不能设置为对象，因为fetch error会setState为字符串
+    const [apiInfo, setApiInfo] = useState()
+
     useEffect(() => {
         if (loginStatus) {
             props.history.push('/')
@@ -32,31 +32,37 @@ const Login = (props) => {
     }
 
     const fetchUserApi = async () => {
-        let result = await fetch(userApi, {
-            method: 'POST',
-            body: JSON.stringify(loginData),
-            headers: new Headers({
-                'Content-Type': 'application/json'
+        try {
+            let result = await fetch(userApi, {
+                method: 'POST',
+                body: JSON.stringify(loginData),
+                headers: new Headers({
+                    'Content-Type': 'application/json'
+                })
             })
-        })
-        result = await result.json()
-        if (result.info) {
-            setApiInfo(result.info)
-        }
-        if (result.token) {
-            setToken({
-                token: result.token,
-                username: result.username
-            })
-            // 保存token到cookie
-            setCookie('token', result.token, { path: '/' })
-            setLoginStatus(true)
-            // 等待setLoginStatus结束后才进行goBack操作，否则会出现挂载未结束告警
-            if (loginStatus) {
-                props.history.goBack()
+            console.log(result)
+            // result = Response响应对象
+            if (result.ok) {
+                result = await result.json()
+                setApiInfo(result.info)
+                setToken({
+                    token: result.token,
+                    username: result.username
+                })
+                // 保存token到cookie
+                setCookie('token', result.token, { path: '/' })
+                setLoginStatus(true)
+                // 等待setLoginStatus结束后才进行goBack操作，否则会出现挂载未结束告警
+                if (loginStatus) {
+                    props.history.goBack()
+                }
+            } else {
+                result = await result.json()
+                setApiInfo(result.info)
+                props.history.push('/login')
             }
-        } else {
-            props.history.push('/login')
+        } catch (err) {
+            setApiInfo(`API error(${err.message})`)
         }
 
     }

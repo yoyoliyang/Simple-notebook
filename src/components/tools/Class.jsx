@@ -1,13 +1,5 @@
 import React from 'react'
 
-export const Alert = (props) => {
-    return (
-        <div class="alert alert-primary" role="alert">
-            {props.children}
-        </div>
-    )
-}
-
 export const MainClass = (props) => {
     return (
         <main role="main" className="container">
@@ -19,5 +11,13 @@ export const MainClass = (props) => {
                 </div>
             </div>
         </main>
+    )
+}
+
+export const Alert = (props) => {
+    return (
+        <div class="alert alert-success">
+            <strong>{props.children}</strong>
+        </div>
     )
 }

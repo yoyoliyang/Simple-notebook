@@ -4,6 +4,7 @@ import { useCookies } from "react-cookie"
 const Edit = (props) => {
 
     const [cookies, removeCookie] = useCookies('token')
+    const [apiInfo, setApiInfo] = useState()
     const [blogData, setBlogData] = useState({
         _id: props._id,
         subject: props.subject,
@@ -21,19 +22,25 @@ const Edit = (props) => {
 
     const blogDataApi = "http://192.168.1.123:5000/api/blog/"
     const editBlogDataApi = async () => {
-        await fetch(blogDataApi + 'update', {
-            method: 'POST',
-            body: JSON.stringify(blogData),
-            headers: new Headers({
-                'Content-Type': 'application/json'
+        try {
+            let result = await fetch(blogDataApi + 'update', {
+                method: 'POST',
+                body: JSON.stringify(blogData),
+                headers: new Headers({
+                    'Content-Type': 'application/json'
+                })
             })
-        })
+            if (result.ok) {
+                props.handleEdit(false)
+                props.handleRefetch()
+            }
+        } catch (err) {
+            setApiInfo(`API error(${err.message})`)
+        }
     }
 
     const handleSubmit = (e) => {
         editBlogDataApi()
-        props.handleView(false)
-        props.handleRefetch()
         e.preventDefault()
     }
     return (
@@ -48,6 +55,7 @@ const Edit = (props) => {
             </div>
             <button type="submit" className="btn btn-primary" >Submit</button>
             <button className="btn btn-sm" onClick={() => props.handleView(false)}>Cancel</button>
+            {apiInfo ? <span className="ml-4 text-danger">{apiInfo}</span> : ''}
         </form>
     )
 }

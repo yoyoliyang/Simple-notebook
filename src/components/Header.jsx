@@ -1,12 +1,14 @@
-import React, { useContext, useEffect, useCallback } from "react"
+import React, { useContext, useEffect, useCallback, useState } from "react"
 import { Link, withRouter } from "react-router-dom"
 import { LoginStatusContext } from "./LoginTokenContext"
 import { useCookies } from "react-cookie"
 
 const Header = (props) => {
+    // Header包含了一个check_token的函数，用来检测token是否有效
 
     const [loginStatus, setLoginStatus] = useContext(LoginStatusContext)
     const [cookies, removeCookie] = useCookies('token')
+    const [apiInfo, setApiInfo] = useState()
 
     const handleLogout = () => {
         removeCookie('token')
@@ -17,19 +19,23 @@ const Header = (props) => {
     const tokenApi = 'http://192.168.1.123:5000/api/check_token'
     const checkToken = useCallback(async () => {
         // api post数据并返回erorr
-        let result = await fetch(tokenApi, {
-            method: 'POST',
-            body: JSON.stringify(cookies),
-            headers: new Headers({
-                'Content-Type': 'application/json'
+        try {
+            let result = await fetch(tokenApi, {
+                method: 'POST',
+                body: JSON.stringify(cookies),
+                headers: new Headers({
+                    'Content-Type': 'application/json'
+                })
             })
-        })
-        result = await result.json() 
-        // console.log('Debug: Header-', result)
-        if (result.message === 'success') {
-            setLoginStatus(true)
-        } else {
-            setLoginStatus(false)
+            if (result.ok) {
+                result = await result.json()
+                // console.log('Debug: Header-', result)
+                setLoginStatus(true)
+            } else {
+                setLoginStatus(false)
+            }
+        } catch (err) {
+            setApiInfo(`API error(${err.message})`)
         }
     }, [cookies, setLoginStatus])
 
@@ -57,6 +63,7 @@ const Header = (props) => {
                             </>
                             :
                             <>
+                                {apiInfo ? <span className="mr-4 text-danger">{apiInfo}</span> : ''}
                                 <Link className="btn btn-sm btn-outline-secondary" to="/login" >Login</Link>
                             </>
                         }

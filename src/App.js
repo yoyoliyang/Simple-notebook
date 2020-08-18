@@ -11,6 +11,7 @@ import Add from './components/Add'
 import { Route, BrowserRouter as Router, Switch } from "react-router-dom"
 import { LoginTokenProvider, LoginStatusProvider } from "./components/LoginTokenContext"
 import { CookiesProvider } from "react-cookie"
+import NotFound from './components/NotFound';
 
 const App = () => {
 
@@ -26,6 +27,7 @@ const App = () => {
               <Route exact path="/" component={List} />
               <Route exact path="/login" component={Login} />
               <Route exact path="/:slug" component={View} />
+              <Route exact path="/404" component={NotFound} />
             </Switch>
             <Footer />
           </LoginStatusProvider>

@@ -9,28 +9,25 @@ const List = (props) => {
     const [page, setPage] = useState(1)
     const [lastPage, setLastPage] = useState(1)
     const [searchData, setSearchData] = useState([])
+    const [apiInfo, setApiInfo] = useState()
     const blogListApi = 'http://192.168.1.123:5000/api/blog/'
 
 
     const fetchBlogList = useCallback(async (count) => {
         if (count) {
-            let listData, error
             try {
-                listData = await fetch(blogListApi + 'last?page=' + count)
+                let result = await fetch(blogListApi + 'last?page=' + count)
+                if (result.ok) {
+                    result = await result.json()
+                    if (result.count === 0) {
+                        // 空数据库（没有任何blog的时候）跳转到add页面以添加
+                        props.history.push('/add')
+                    }
+                    setBlogList(result)
+                }
             } catch (err) {
-                console.log('fetch error')
-                error = true
+                setApiInfo(`API error(${err.message})`)
             }
-            if (error) {
-                listData = { apiMsg: 'Failed to fetch API' }
-            } else {
-                listData = await listData.json()
-            }
-            // 空数据库（没有任何blog的时候）跳转到add页面以添加
-            if ("error" in listData) {
-                props.history.push('/add')
-            }
-            setBlogList(listData)
         }
         else {
             fetchBlogList(1)
@@ -100,16 +97,6 @@ const List = (props) => {
             </>
         )
     }
-
-    const LoadingHTML = () => {
-        return (
-            <>
-                <div className="blog-post-title-loading" />
-                <div className="blog-post-meta-loading" />
-                <div className="blog-post-data-loading" />
-            </>
-        )
-    }
     return (
         <>
             <main role="main" className="container">
@@ -121,11 +108,11 @@ const List = (props) => {
                             : <></>}
                         <>
                             {/* api获取信息提示 */}
-                            {blogList.apiMsg ? <h3 className="text-danger">Failed to fetch API</h3> :
+                            {apiInfo ? <h6 className="text-danger">{apiInfo}</h6> :
                                 <>
                                     {/* blog列表载入（防止在api数据未获取前渲染空html） */}
                                     {blogList.loading ?
-                                    <></>
+                                        <></>
                                         :
                                         <BlogListHTML />
                                     }

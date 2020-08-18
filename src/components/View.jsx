@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useCallback } from 'react'
 import Edit from "./Edit"
-import NotFound from './NotFound'
 import { MainClass } from "./tools/Class"
 import { useParams } from "react-router-dom"
 import Md from "./tools/Markdown"
@@ -19,16 +18,21 @@ const View = (props) => {
     const [edit, setEdit] = useState(false)
     // 用来更新父组件refetch，以便useEffect重新渲染
     const [refetch, setRefetch] = useState(false)
-    const [error, setError] = useState(false)
+    const [apiInfo, setApiInfo] = useState()
 
-    const fetchBlogData = async (id) => {
-        let data = await fetch(blogDataApi + id)
-        data = await data.json()
-        if ('error' in data) {
-            setError(true)
+    const fetchBlogData = useCallback(async (id) => {
+        try {
+            let result = await fetch(blogDataApi + id)
+            if (result.ok) {
+                result = await result.json()
+                setBlogData(result)
+            } else {
+                props.history.push('/404')
+            }
+        } catch (err) {
+            setApiInfo(`API err(${err.message})`)
         }
-        setBlogData(data)
-    }
+    },[props.history])
 
     const fetchDeleteBlogData = async () => {
         await fetch(blogDataApi + 'del', {
@@ -63,11 +67,11 @@ const View = (props) => {
             setRefetch(false)
             fetchBlogData(slug)
         }
-    }, [refetch, slug])
+    }, [fetchBlogData, refetch, slug])
 
     useEffect(() => {
         fetchBlogData(slug)
-    }, [slug])
+    }, [fetchBlogData, slug])
 
     const Content = () => {
         return (
@@ -78,7 +82,7 @@ const View = (props) => {
                             {
                                 edit ?
                                     <Edit _id={blogData._id
-                                    } timestamp={blogData.timestamp} subject={blogData.subject} data={blogData.data} handleView={handleEdit} handleRefetch={handleRefetch} fetchBlogData={fetchBlogData} />
+                                    } timestamp={blogData.timestamp} subject={blogData.subject} data={blogData.data} handleEdit={handleEdit} handleRefetch={handleRefetch} fetchBlogData={fetchBlogData} />
                                     :
                                     <>
                                         <h2 className="blog-post-title" >{blogData.subject}</h2>
@@ -103,7 +107,11 @@ const View = (props) => {
 
     return (
         <>
-            {error ? <NotFound /> : <Content />}
+            {apiInfo ?
+                <MainClass><div className="text-danger">{apiInfo}</div></MainClass>
+                :
+                <Content />
+            }
         </>
     )
 }

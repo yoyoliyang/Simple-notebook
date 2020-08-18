@@ -20,6 +20,8 @@ const Add = (props) => {
         token: cookies.token
     })
 
+    const [apiInfo, setApiInfo] = useState()
+
     const handleEdit = (e) => {
         setBlogData({
             ...blogData,
@@ -29,16 +31,20 @@ const Add = (props) => {
 
     // 注意此处不能为异步fetch，下方需要获取发布后的数据
     const fetchBlogDataApi = async () => {
-        let result = await fetch(blogDataApi + 'add', {
-            method: 'POST',
-            body: JSON.stringify(blogData),
-            headers: new Headers({
-                'Content-Type': 'application/json'
+        try {
+            let result = await fetch(blogDataApi + 'add', {
+                method: 'POST',
+                body: JSON.stringify(blogData),
+                headers: new Headers({
+                    'Content-Type': 'application/json'
+                })
             })
-        })
-        result = await result.json()
-        if (result.info) {
-            props.history.push('/' + blogData._id)
+            if (result.ok) {
+                result = await result.json()
+                props.history.push('/' + blogData._id)
+            }
+        } catch (err) {
+            setApiInfo(`API err(${err.message})`)
         }
     }
 
@@ -64,6 +70,7 @@ const Add = (props) => {
                             </div>
                             <button type="submit" className="btn btn-primary" >Submit</button>
                             <button className="btn btn-sm" >Cancel</button>
+                            {apiInfo ? <span className="ml-4 text-danger">{apiInfo}</span> : ''}
                         </form>
                     </MainClass>
                 </>
