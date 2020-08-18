@@ -51,8 +51,10 @@ const Login = (props) => {
             // 保存token到cookie
             setCookie('token', result.token, { path: '/' })
             setLoginStatus(true)
-            // props.history.push('/')
-            props.history.goBack()
+            // 等待setLoginStatus结束后才进行goBack操作，否则会出现挂载未结束告警
+            if (loginStatus) {
+                props.history.goBack()
+            }
         } else {
             props.history.push('/login')
         }
