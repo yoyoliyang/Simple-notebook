@@ -1,20 +1,20 @@
 import React from "react"
-// import { LoginTokenContext } from "./LoginTokenContext"
+import Search from "./Search"
 
-const SideBar = () => {
+const SideBar = (props) => {
 
-    // const [token, setToken] = useContext(LoginTokenContext)
-
-    // useEffect(() => {
-    //     console.log(token)
-    // }, [token])
 
     return (
         <aside className="col-md-4 blog-sidebar">
             <div className="p-3 mb-3 bg-light rounded">
                 <h4 className="font-italic">About</h4>
                 {/* { token ? <span>token: {token}</span> : '' } */}
-                <p className="mb-0">这是我的笔记本 <em>注意了：</em> 这里面的内容是硬编码写入的，不要尝试从管理修改。</p>
+                <p className="mb-0">这是我的笔记本 <em>兴趣是学习进步的动力</em></p>
+            </div>
+
+            <div className="p-3" >
+                {/* 传递父组件函数至Search组件 */}
+                <Search handleSetSearch={props.handleSetSearch}/>
             </div>
 
             <div className="p-3">

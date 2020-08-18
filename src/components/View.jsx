@@ -12,10 +12,10 @@ const View = (props) => {
 
     const [cookies, removeCookie] = useCookies('token')
     const [loginStatus, setLoginStatus] = useContext(LoginStatusContext)
-    const blogDataApi = "http://127.0.0.1:5000/api/blog/"
+    const blogDataApi = "http://192.168.1.123:5000/api/blog/"
     let { slug } = useParams()
 
-    const [blogData, setBlogData] = useState({})
+    const [blogData, setBlogData] = useState({ loading: true })
     const [edit, setEdit] = useState(false)
     // 用来更新父组件refetch，以便useEffect重新渲染
     const [refetch, setRefetch] = useState(false)
@@ -59,40 +59,43 @@ const View = (props) => {
 
     useEffect(() => {
         if (refetch) {
-            console.log('reloading')
             // 改回原始state，以便下次重新刷新
             setRefetch(false)
             fetchBlogData(slug)
         }
     }, [refetch, slug])
 
-    useEffect(()=>{
+    useEffect(() => {
         fetchBlogData(slug)
-    },[slug])
+    }, [slug])
 
     const Content = () => {
         return (
             <>
                 <MainClass>
-                    {
-                        edit ?
-                            <Edit _id={blogData._id
-                            } timestamp={blogData.timestamp} subject={blogData.subject} data={blogData.data} handleView={handleEdit} handleRefetch={handleRefetch} fetchBlogData={fetchBlogData} />
-                            :
-                            <>
-                                <h2 className="blog-post-title" >{blogData.subject}</h2>
-                                <p className="blog-post-meta">
-                                    {new Date(blogData.timestamp).toLocaleString()}
-                                    {loginStatus ?
-                                        <>
-                                            <span><button className="btn btn-primary btn-sm" onClick={() => handleEdit(true)}>编辑</button></span>
-                                            <span><button className="btn btn-sm text-danger" onClick={(e) => handleDelete(e)}>删除</button></span>
-                                        </>
-                                        : ''
-                                    }
-                                </p>
-                                <Md source={blogData.data} />
-                            </>}
+                    {blogData.loading ? '' :
+                        <>
+                            {
+                                edit ?
+                                    <Edit _id={blogData._id
+                                    } timestamp={blogData.timestamp} subject={blogData.subject} data={blogData.data} handleView={handleEdit} handleRefetch={handleRefetch} fetchBlogData={fetchBlogData} />
+                                    :
+                                    <>
+                                        <h2 className="blog-post-title" >{blogData.subject}</h2>
+                                        <p className="blog-post-meta">
+                                            {new Date(blogData.timestamp).toLocaleString()}
+                                            {loginStatus ?
+                                                <>
+                                                    <span><button className="btn btn-primary btn-sm" onClick={() => handleEdit(true)}>编辑</button></span>
+                                                    <span><button className="btn btn-sm text-danger" onClick={(e) => handleDelete(e)}>删除</button></span>
+                                                </>
+                                                : ''
+                                            }
+                                        </p>
+                                        <Md source={blogData.data} />
+                                    </>}
+                        </>
+                    }
                 </MainClass>
             </>
         )

@@ -19,7 +19,7 @@ const Edit = (props) => {
         })
     }
 
-    const blogDataApi = "http://127.0.0.1:5000/api/blog/"
+    const blogDataApi = "http://192.168.1.123:5000/api/blog/"
     const editBlogDataApi = async () => {
         await fetch(blogDataApi + 'update', {
             method: 'POST',

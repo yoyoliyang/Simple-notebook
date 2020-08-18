@@ -10,7 +10,7 @@ const Add = (props) => {
     const [loginStatus, setLoginStatus] = useContext(LoginStatusContext)
     const [cookies, removeCookie] = useCookies('token')
     const _id = uuid4()
-    const blogDataApi = "http://127.0.0.1:5000/api/blog/"
+    const blogDataApi = "http://192.168.1.123:5000/api/blog/"
 
     const [blogData, setBlogData] = useState({
         _id: _id,
@@ -27,41 +27,49 @@ const Add = (props) => {
         })
     }
 
-    const fetchBlogDataApi = async (e) => {
-        await fetch(blogDataApi + 'add', {
+    // 注意此处不能为异步fetch，下方需要获取发布后的数据
+    const fetchBlogDataApi = async () => {
+        let result = await fetch(blogDataApi + 'add', {
             method: 'POST',
             body: JSON.stringify(blogData),
             headers: new Headers({
                 'Content-Type': 'application/json'
             })
         })
+        result = await result.json()
+        if (result.info) {
+            props.history.push('/'+blogData._id)
+        }
     }
+
     const handleSubmit = (e) => {
-        // post添加后的数据
         fetchBlogDataApi()
-        props.history.push("/" + blogData._id)
         e.preventDefault()
     }
 
-
+    const AddHTML = () => {
+        return (
+            <MainClass>
+                <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label htmlFor="subject" />
+                        <input className="form-control" name="subject" value={blogData.subject} onChange={handleEdit} placeholder="标题" required />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="data" />
+                        <textarea rows="10" className="form-control" name="data" value={blogData.data} onChange={handleEdit} placeholder="内容(支持markdown)" required />
+                    </div>
+                    <button type="submit" className="btn btn-primary" >Submit</button>
+                    <button className="btn btn-sm" onClick={() => props.history.push("/")}>Cancel</button>
+                </form>
+            </MainClass>
+        )
+    }
 
     return (
         <>
             {loginStatus ?
-                <MainClass>
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <label htmlFor="subject" />
-                            <input className="form-control" name="subject" value={blogData.subject} onChange={handleEdit} placeholder="标题" required />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="data" />
-                            <textarea rows="10" className="form-control" name="data" value={blogData.data} onChange={handleEdit} placeholder="内容(支持markdown)" required />
-                        </div>
-                        <button type="submit" className="btn btn-primary" >Submit</button>
-                        <button className="btn btn-sm" onClick={() => props.history.push("/")}>Cancel</button>
-                    </form>
-                </MainClass>
+                <AddHTML />
                 :
                 <NotFound />
             }

@@ -9,13 +9,15 @@ const Login = (props) => {
 
     const [cookies, setCookie] = useCookies('token')
 
-    const userApi = "http://127.0.0.1:5000/api/user"
+    const userApi = "http://192.168.1.123:5000/api/user"
 
     const [loginData, setLoginData] = useState({
         username: '',
         password: ''
     })
 
+    // 登录错误信息state
+    const [apiInfo, setApiInfo] = useState('')
     useEffect(() => {
         if (loginStatus) {
             props.history.push('/')
@@ -38,6 +40,9 @@ const Login = (props) => {
             })
         })
         result = await result.json()
+        if (result.info) {
+            setApiInfo(result.info)
+        }
         if (result.token) {
             setToken({
                 token: result.token,
@@ -71,7 +76,9 @@ const Login = (props) => {
                         <label htmlFor="password" />
                         <input rows="10" className="form-control" name="password" value={loginData.password} onChange={(e) => handleEdit(e)} placeholder="密码" autoFocus required />
                     </div>
-                    <button type="submit" className="btn btn-primary" >Submit</button>
+                    <button type="submit" className="btn btn-primary" >Submit
+                    </button>
+                    {apiInfo ? <span className="ml-4 text-danger">{apiInfo}</span> : ''}
                 </form>
             </MainClass>
         </>

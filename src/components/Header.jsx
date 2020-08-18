@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useCallback } from "react"
+import React, { useContext, useEffect, useCallback } from "react"
 import { Link, withRouter } from "react-router-dom"
 import { LoginStatusContext } from "./LoginTokenContext"
 import { useCookies } from "react-cookie"
@@ -14,7 +14,7 @@ const Header = (props) => {
         props.history.push('/login')
     }
 
-    const tokenApi = 'http://127.0.0.1:5000/api/check_token'
+    const tokenApi = 'http://192.168.1.123:5000/api/check_token'
     const checkToken = useCallback(async () => {
         // api post数据并返回erorr
         let result = await fetch(tokenApi, {
@@ -24,8 +24,8 @@ const Header = (props) => {
                 'Content-Type': 'application/json'
             })
         })
-        result = await result.json()
-        console.log('Debug: Header-', result)
+        result = await result.json() 
+        // console.log('Debug: Header-', result)
         if (result.message === 'success') {
             setLoginStatus(true)
         } else {
