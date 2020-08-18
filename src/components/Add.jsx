@@ -38,7 +38,7 @@ const Add = (props) => {
         })
         result = await result.json()
         if (result.info) {
-            props.history.push('/'+blogData._id)
+            props.history.push('/' + blogData._id)
         }
     }
 
@@ -47,29 +47,26 @@ const Add = (props) => {
         e.preventDefault()
     }
 
-    const AddHTML = () => {
-        return (
-            <MainClass>
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="subject" />
-                        <input className="form-control" name="subject" value={blogData.subject} onChange={handleEdit} placeholder="标题" required />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="data" />
-                        <textarea rows="10" className="form-control" name="data" value={blogData.data} onChange={handleEdit} placeholder="内容(支持markdown)" required />
-                    </div>
-                    <button type="submit" className="btn btn-primary" >Submit</button>
-                    <button className="btn btn-sm" onClick={() => props.history.push("/")}>Cancel</button>
-                </form>
-            </MainClass>
-        )
-    }
 
     return (
         <>
             {loginStatus ?
-                <AddHTML />
+                <>
+                    <MainClass>
+                        <form onSubmit={handleSubmit}>
+                            <div className="form-group">
+                                <label htmlFor="subject" />
+                                <input className="form-control" name="subject" value={blogData.subject} onChange={(e) => handleEdit(e)} placeholder="标题" required />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="data" />
+                                <textarea rows="10" className="form-control" name="data" value={blogData.data} onChange={(e) => handleEdit(e)} placeholder="内容(支持markdown)" required />
+                            </div>
+                            <button type="submit" className="btn btn-primary" >Submit</button>
+                            <button className="btn btn-sm" >Cancel</button>
+                        </form>
+                    </MainClass>
+                </>
                 :
                 <NotFound />
             }
