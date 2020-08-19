@@ -27,7 +27,7 @@ const Edit = (props) => {
     const handleInsertImage = (imgName, base64str) => {
         setBlogData({
             ...blogData,
-            data: blogData.data + `![${imgName}](${imgApi}/${imgName})`,
+            data: blogData.data + `![${imgName}](${imgApi}/${imgName})` + '  ',
             image: {
                 ...blogData.image,
                 [imgName]: base64str
@@ -71,7 +71,7 @@ const Edit = (props) => {
                 <Clipboard blogData={blogData} handleEdit={handleEdit} handleInsertImage={handleInsertImage} />
             </div>
             <button type="submit" className="btn btn-primary" >Submit</button>
-            <button className="btn btn-sm" onClick={() => props.handleView(false)}>Cancel</button>
+            <button className="btn btn-sm" type="button" onClick={() => props.handleEdit(false)}>Cancel</button> {/* 注意此处的type为button，否则会和form冲突 */}
             {apiInfo ? <span className="ml-4 text-danger">{apiInfo}</span> : ''}
         </form>
     )

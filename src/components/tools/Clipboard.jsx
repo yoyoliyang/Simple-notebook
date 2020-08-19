@@ -19,10 +19,6 @@ const Clipboard = (props) => {
     }
 
 
-    useEffect(() => {
-        console.log(props.blogData.data)
-    }, [props.blogData.data])
-
     const handleKeyDown = (e) => {
         if (e.ctrlKey) {
             if (e.keyCode === 86) {
