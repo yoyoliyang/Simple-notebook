@@ -14,7 +14,7 @@ const Md = (props) => {
     const [isloading, setIsloading] = useState(true)
 
     const HtmlContent = () => {
-        // source:夫组建传递过来的markdown源代码
+        // source:父组件传递过来的markdown源代码
         let mdString = marked(props.source)
         mdString = HtmlReactParser(mdString)
         return (

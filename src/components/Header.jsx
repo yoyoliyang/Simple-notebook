@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useCallback, useState } from "react"
 import { Link, withRouter } from "react-router-dom"
 import { LoginStatusContext } from "./LoginTokenContext"
 import { useCookies } from "react-cookie"
+import {tokenApi} from './tools/Env'
 
 const Header = (props) => {
     // Header包含了一个check_token的函数，用来检测token是否有效
@@ -16,7 +17,6 @@ const Header = (props) => {
         props.history.push('/login')
     }
 
-    const tokenApi = 'http://192.168.1.123:5000/api/check_token'
     const checkToken = useCallback(async () => {
         // api post数据并返回erorr
         try {
@@ -33,6 +33,7 @@ const Header = (props) => {
                 setLoginStatus(true)
             } else {
                 setLoginStatus(false)
+                setApiInfo(`token has expired`)
             }
         } catch (err) {
             setApiInfo(`API error(${err.message})`)

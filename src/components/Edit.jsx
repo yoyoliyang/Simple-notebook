@@ -1,5 +1,7 @@
 import React, { useState } from "react"
 import { useCookies } from "react-cookie"
+import { blogDataApi, imgApi } from "./tools/Env"
+import  Clipboard  from './tools/Clipboard'
 
 const Edit = (props) => {
 
@@ -10,6 +12,7 @@ const Edit = (props) => {
         subject: props.subject,
         timestamp: Date.now(),
         data: props.data,
+        image: props.image,
         token: cookies.token
     })
 
@@ -20,7 +23,18 @@ const Edit = (props) => {
         })
     }
 
-    const blogDataApi = "http://192.168.1.123:5000/api/blog/"
+    // Clipboard组件将imgData markdown代码插入到文本框中
+    const handleInsertImage = (imgName, base64str) => {
+        setBlogData({
+            ...blogData,
+            data: blogData.data + `![${imgName}](${imgApi}/${imgName})`,
+            image: {
+                ...blogData.image,
+                [imgName]: base64str
+            }
+        })
+    }
+
     const editBlogDataApi = async () => {
         try {
             let result = await fetch(blogDataApi + 'update', {
@@ -39,19 +53,22 @@ const Edit = (props) => {
         }
     }
 
+
     const handleSubmit = (e) => {
         editBlogDataApi()
         e.preventDefault()
     }
     return (
         <form onSubmit={(e) => handleSubmit(e)}>
-            <div className="form-group">
-                <label htmlFor="subject" />
-                <input className="form-control" name="subject" value={blogData.subject} onChange={(e) => handleEdit(e)} required />
+            <div className="form-row">
+                <div className="col-7">
+                    <label htmlFor="subject" />
+                    <input className="form-control" name="subject" value={blogData.subject} onChange={(e) => handleEdit(e)} required />
+                </div>
             </div>
             <div className="form-group">
                 <label htmlFor="data" />
-                <textarea rows="10" className="form-control" name="data" value={blogData.data} onChange={(e) => handleEdit(e)} required />
+                <Clipboard blogData={blogData} handleEdit={handleEdit} handleInsertImage={handleInsertImage} />
             </div>
             <button type="submit" className="btn btn-primary" >Submit</button>
             <button className="btn btn-sm" onClick={() => props.handleView(false)}>Cancel</button>

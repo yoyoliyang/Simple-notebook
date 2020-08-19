@@ -2,21 +2,23 @@ import React, { useEffect, useState, useCallback } from "react"
 import SideBar from './SideBar'
 import { Link } from "react-router-dom"
 import Md from "./tools/Markdown"
+import {blogDataApi} from "./tools/Env"
 
 const List = (props) => {
+
 
     const [blogList, setBlogList] = useState([{ loading: true }])
     const [page, setPage] = useState(1)
     const [lastPage, setLastPage] = useState(1)
     const [searchData, setSearchData] = useState([])
+    const [searchCount, setSearchCount] = useState()
     const [apiInfo, setApiInfo] = useState()
-    const blogListApi = 'http://192.168.1.123:5000/api/blog/'
 
 
     const fetchBlogList = useCallback(async (count) => {
         if (count) {
             try {
-                let result = await fetch(blogListApi + 'last?page=' + count)
+                let result = await fetch(blogDataApi + 'last?page=' + count)
                 if (result.ok) {
                     result = await result.json()
                     if (result.count === 0) {
@@ -43,7 +45,7 @@ const List = (props) => {
         setPage(page - 1)
     }
     const fetchLastPageNumber = async () => {
-        let number = await fetch(blogListApi + 'count')
+        let number = await fetch(blogDataApi + 'count')
         number = await number.json()
         setLastPage(Math.ceil(number.count / 10))
     }
@@ -51,6 +53,7 @@ const List = (props) => {
     // set search函数，传递给子组件Sidebar
     const handleSetSearch = (s) => {
         setSearchData(s)
+        setSearchCount(s.length)
         // List数据隐藏
         setBlogList({ loading: true })
     }
@@ -65,6 +68,7 @@ const List = (props) => {
     const SearchHTML = () => {
         return (
             <>
+                {searchCount === 0 ? <h6>Not Found</h6> : ""}
                 {searchData.map((item, index) => {
                     return (
                         <div className="blog-post" key={index}>
@@ -74,7 +78,8 @@ const List = (props) => {
                                 {new Date(item.timestamp).toLocaleString()}
                             </p>
                         </div>)
-                })}
+                })
+                }
             </>
         )
     }
@@ -114,12 +119,14 @@ const List = (props) => {
                                     {blogList.loading ?
                                         <></>
                                         :
-                                        <BlogListHTML />
+                                        <>
+                                            <BlogListHTML />
+                                            <div className="blog-pagination">
+                                                <button className="btn btn-outline-primary" disabled={page === 1 ? 'disabled' : ''} onClick={handlePrevious}>Previous</button>
+                                                <button className="btn btn-outline-secondary" disabled={page === lastPage ? 'disabled' : ''} onClick={handleNext}>Next</button>
+                                            </div>
+                                        </>
                                     }
-                                    <div className="blog-pagination">
-                                        <button className="btn btn-outline-primary" disabled={page === 1 ? 'disabled' : ''} onClick={handlePrevious}>Previous</button>
-                                        <button className="btn btn-outline-secondary" disabled={page === lastPage ? 'disabled' : ''} onClick={handleNext}>Next</button>
-                                    </div>
                                 </>
                             }
                         </>

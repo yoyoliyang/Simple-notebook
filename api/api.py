@@ -4,16 +4,17 @@ from math import ceil
 import time
 import click
 from pymongo import MongoClient
-from flask import Flask, request
+from flask import Flask, request, make_response, send_file
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
-# 调试使用
 from flask_cors import CORS
 from bson.json_util import dumps
 from functools import wraps
-
+from base64 import b64decode
+import io
 
 app = Flask(__name__, static_folder="../build", static_url_path="/")
+
 CORS(app)
 
 
@@ -45,13 +46,13 @@ def token_required(f):
         token = data.get('token')
         if not token:
             print(log_color('debug:(token_required):Token is missing!'))
-            return {'error': 'Token is missing!'}, 403
+            return {'error': 'Token is missing!'}, 401
         try:
             jwt.decode(token, os.getenv('SECRET_KEY'))
         except jwt.exceptions.DecodeError:
-            return {'error': 'Token is invalid!'}, 403
+            return {'error': 'Token is invalid!'}, 400
         except jwt.exceptions.ExpiredSignatureError:
-            return {'error': 'Token is expired!'}, 403
+            return {'error': 'Token is expired!'}, 401
 
         return f(*args, **kwargs)
     return decorated
@@ -79,56 +80,59 @@ def user():
                     )
                     return {
                         'info': 'login successful', 'token': token, 'username': username
-                    }
+                    }, 200
                 else:
                     return {
                         'info': 'error username or password'
-                    }
+                    }, 401
             else:
-                return {'info': 'error username or password'}
+                return {'info': 'error username or password'}, 400
     return {'info': 'user api'}
 
 
-@ app.route('/api/check_token', methods=['POST', 'GET'])
+@app.route('/api/check_token', methods=['POST', 'GET'])
 # token检测
-@ token_required
+@token_required
 def check_token():
-    return {'message': 'success'}
+    return {'message': 'success'}, 200
 
 
-@ app.route('/api/blog/<uuid:id>')
+# uuid 格式url
+@app.route('/api/blog/<uuid:id>')
 def blog_id(id):
     with MongoClient(os.getenv('MONGO_URI')) as c:
         blog = c.simpleBlog.blog
         result = blog.find_one({'_id': str(id)})
-        print('debug: blog_id-', result)
+        # print('debug: blog_id-', result)
         if result:
-            return result
+            return result, 200
         else:
-            return {'info': f'blog with id({id}) not found'}
+            return {'info': f'blog with id({id}) not found'}, 400
     return {'info': 'blog view api'}
 
 
-@ app.route('/api/search')
+@app.route('/api/search')
+# /api/search?keyword=someword
 def search():
     # search api
     with MongoClient(os.getenv('MONGO_URI')) as c:
         blog = c.simpleBlog.blog
         if 'keyword' in request.args:
             keyword = request.args.get('keyword')
-            result = blog.find()
-            result = list(result)
-            search_result = {}
-            for index, item in enumerate(result):
-                if keyword in item.get('subject') or keyword in item.get('data'):
-                    print(item)
-                    search_result.update(item)
-                    print(search_result)
-            return search_result
+            # pymongo 正则判断及运算符
+            result = blog.find({
+                '$or':
+                [
+                    {'subject': {'$regex': keyword}},
+                    {'data': {'$regex': keyword}}
+                ]
+            })
+            return dumps(result)
     return {'info': 'blog search api'}
 
 
-@ app.route('/api/blog/<string:last>')
+# get blog list data
+@app.route('/api/blog/<string:last>')
 def blog_last(last):
     with MongoClient(os.getenv('MONGO_URI')) as c:
         blog = c.simpleBlog.blog
@@ -138,8 +142,12 @@ def blog_last(last):
         # /api/blog/last?index=number
         if last == "last" and 'index' in request.args:
             index = request.args.get('index')
+            try:
+                req_idx_num = int(index)
+            except ValueError:
+                return {'error': 'error index number'}
             # 按_id排序,-1为降序
-            result = blog.find(limit=int(index)).sort("timestamp", -1)
+            result = blog.find(limit=req_idx_num).sort("timestamp", -1)
             if result:
                 return dumps(result)
             else:
@@ -153,6 +161,7 @@ def blog_last(last):
                 req_page_num = int(request.args.get('page'))
             except ValueError:
                 return {'error': 'error list request page number'}, 400
+            # 错误页数请求处理
             if req_page_num > page_count or req_page_num <= 0:
                 return {'error': 'error request page number'}, 400
             else:
@@ -160,17 +169,47 @@ def blog_last(last):
                 result = blog.find(
                     limit=10, skip=req_page_num-1).sort("timestamp", -1)
                 if result:
-                    return dumps(result)
+                    return dumps(result), 200
                 else:
-                    return {'info': 'blog list not found'}
+                    return {'info': 'blog list not found', 'count': 0}, 200
         else:
             return {'error': 'error list request'}, 400
     return {'info': 'blog list api'}
 
+# img api
+@app.route('/api/img/<string:id>')
+def img_path(id):
+    with MongoClient(os.getenv('MONGO_URI')) as c:
+        blog = c.simpleBlog.blog
+        # 获取blog id
+        _id = id.split('--')[0]
+        result = blog.find_one({'_id': _id})
+        if result:
+            base64str = result.get('image').get(id)
+            # return base64str
+            if base64str:
+                # base64代码转为二进制
+                img_binary = b64decode(base64str.split(',')[1])
+                response = send_file(io.BytesIO(img_binary), 
+                    mimetype="image/png",
+                    # 作为下载附件的参数
+                    # as_attachment=True,
+                    # attachment_filename=f'{id}.png'
+                    )
+                return response
+            else:
+                return '', 404
+        else:
+            return {'info': f'not found blog with id {id}'}, 404
+        
+    return {
+        'info': 'blog img api'
+    }
+
 
 # add or update
-@ app.route('/api/blog/<string:action>', methods=['POST', 'GET'])
-@ token_required
+@app.route('/api/blog/<string:action>', methods=['POST', 'GET'])
+@token_required
 def blog_add(action):
     if request.method == "POST" and (action == "add" or action == "update"):
         request_data = request.get_json()
@@ -183,27 +222,31 @@ def blog_add(action):
                          "timestamp": request_data.get('timestamp'),
                          "subject": request_data.get('subject'),
                          "data": request_data.get('data'),
+                         "image": request_data.get('image'),
                          "tag": request_data.get('tag')
                          })
                     return {
                         'info': 'successfully added'
-                    }
+                    }, 200
                 if action == "update":
                     blog.find_one_and_update(
                         {"_id": request_data.get('_id')},
                         {'$set': {'subject': request_data.get(
-                            'subject'), 'timestamp': request_data.get('timestamp'), 'data': request_data.get('data')}}
+                            'subject'), 'timestamp': request_data.get('timestamp'),
+                            'data': request_data.get('data'),
+                            "image": request_data.get('image')
+                            }}
                     )
                     return {
                         'info': 'successfully updated'
-                    }
+                    }, 200
         else:
             return {'error': 'error request'}, 400
     return {'info': 'blog add api'}
 
 
-@ app.route('/api/blog/del', methods=['POST', 'GET'])
-@ token_required
+@app.route('/api/blog/del', methods=['POST', 'GET'])
+@token_required
 def blog_delete():
     if request.method == "POST":
         request_data = request.get_json()

@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import {searchApi} from './tools/Env'
 
 const Search = (props) => {
 
@@ -9,7 +10,6 @@ const Search = (props) => {
         setValue(e.target.value)
     }
 
-    const searchApi = "http://192.168.1.123:5000/api/search?keyword="
     const fetchSearchData = async (s) => {
         let result = await fetch(searchApi + s)
         result = await result.json()

@@ -5,13 +5,13 @@ import { useParams } from "react-router-dom"
 import Md from "./tools/Markdown"
 import { useCookies } from "react-cookie"
 import { LoginStatusContext } from "./LoginTokenContext"
+import {blogDataApi} from "./tools/Env"
 
 // /blog
 const View = (props) => {
 
     const [cookies, removeCookie] = useCookies('token')
     const [loginStatus, setLoginStatus] = useContext(LoginStatusContext)
-    const blogDataApi = "http://192.168.1.123:5000/api/blog/"
     let { slug } = useParams()
 
     const [blogData, setBlogData] = useState({ loading: true })
@@ -82,7 +82,7 @@ const View = (props) => {
                             {
                                 edit ?
                                     <Edit _id={blogData._id
-                                    } timestamp={blogData.timestamp} subject={blogData.subject} data={blogData.data} handleEdit={handleEdit} handleRefetch={handleRefetch} fetchBlogData={fetchBlogData} />
+                                    } timestamp={blogData.timestamp} subject={blogData.subject} data={blogData.data} image={blogData.image} handleEdit={handleEdit} handleRefetch={handleRefetch} fetchBlogData={fetchBlogData} />
                                     :
                                     <>
                                         <h2 className="blog-post-title" >{blogData.subject}</h2>

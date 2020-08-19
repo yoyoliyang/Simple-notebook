@@ -8,7 +8,7 @@ const Login = (props) => {
     const [loginStatus, setLoginStatus] = useContext(LoginStatusContext)
     const [cookies, setCookie] = useCookies('token')
 
-    const userApi = "http://192.168.1.123:5000/api/user"
+    const userApi = "https://192.168.1.123:5000/api/user"
 
     const [loginData, setLoginData] = useState({
         username: '',
@@ -40,7 +40,6 @@ const Login = (props) => {
                     'Content-Type': 'application/json'
                 })
             })
-            console.log(result)
             // result = Response响应对象
             if (result.ok) {
                 result = await result.json()
