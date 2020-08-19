@@ -8,7 +8,6 @@ import Footer from "./components/Footer"
 import Page from "./components/Page"
 import View from './components/View'
 import Add from './components/Add'
-import Test from './components/Test'
 import { Route, BrowserRouter as Router, Switch } from "react-router-dom"
 import { LoginTokenProvider, LoginStatusProvider } from "./components/LoginTokenContext"
 import { CookiesProvider } from "react-cookie"
@@ -27,10 +26,9 @@ const App = () => {
               <Route exact path="/add" component={Add} />
               <Route exact path="/" component={List} />
               <Route exact path="/login" component={Login} />
-              <Route exact path="/test" component={Test} />
+              <Route exact path="/404" component={NotFound} />
               {/* 此处注意排序 */}
               <Route exact path="/:slug" component={View} />
-              <Route exact path="/404" component={NotFound} />
             </Switch>
             <Footer />
           </LoginStatusProvider>
