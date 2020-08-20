@@ -3,6 +3,7 @@ import SideBar from './SideBar'
 import { Link } from "react-router-dom"
 import Md from "./tools/Markdown"
 import {blogDataApi} from "./tools/Env"
+import loading from "../loading.svg"
 
 const List = (props) => {
 
@@ -75,7 +76,7 @@ const List = (props) => {
                             <h2 className="blog-post-title" ><Link to={"/" + item._id}>{item.subject}</Link></h2>
                             <p className="blog-post-meta">
                                 {/* 此处将item中的时间戳转化为可读模式 */}
-                                {new Date(item.timestamp).toLocaleString()}
+                                {item ? new Date(item.timestamp).toLocaleString() : <img src={loading} alt={loading} />}
                             </p>
                         </div>)
                 })
@@ -93,7 +94,7 @@ const List = (props) => {
                             <h2 className="blog-post-title" ><Link to={"/" + item._id}>{item.subject}</Link></h2>
                             <p className="blog-post-meta">
                                 {/* 此处将item中的时间戳转化为可读模式 */}
-                                {new Date(item.timestamp).toLocaleString()}
+                                {item.timestamp ? new Date(item.timestamp).toLocaleString() : <img src={loading} alt={loading}/>}
                             </p>
                             <Md source={item.data} />
                         </div>
