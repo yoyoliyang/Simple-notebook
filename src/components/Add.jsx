@@ -4,7 +4,7 @@ import NotFound from "./NotFound"
 import { v4 as uuid4 } from 'uuid'
 import { useCookies } from "react-cookie"
 import { LoginStatusContext } from "./LoginTokenContext"
-import { blogDataApi, imgApi } from "./tools/Env"
+import { blogDataApi } from "./tools/Env"
 import Clipboard from "./tools/Clipboard"
 
 const Add = (props) => {
@@ -31,10 +31,10 @@ const Add = (props) => {
         })
     }
     // Clipboard组件将imgData markdown代码插入到文本框中
-    const handleInsertImage = (imgName, base64str) => {
+    const handleInsertImage = (value, imgName, base64str) => {
         setBlogData({
             ...blogData,
-            data: blogData.data + `![${imgName}](${imgApi}/${imgName})`,
+            data: value,
             image: {
                 ...blogData.image,
                 [imgName]: base64str

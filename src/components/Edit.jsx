@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { useCookies } from "react-cookie"
-import { blogDataApi, imgApi } from "./tools/Env"
+import { blogDataApi  } from "./tools/Env"
 import  Clipboard  from './tools/Clipboard'
 
 const Edit = (props) => {
@@ -23,11 +23,12 @@ const Edit = (props) => {
         })
     }
 
-    // Clipboard组件将imgData markdown代码插入到文本框中
-    const handleInsertImage = (imgName, base64str) => {
+
+    // Clipboard组件将处理后的value(包含图像链接markdown代码) imgData 插入到文本框中
+    const handleInsertImage = (value, imgName, base64str) => {
         setBlogData({
             ...blogData,
-            data: blogData.data + `![${imgName}](${imgApi}/${imgName})` + '  ',
+            data: value,
             image: {
                 ...blogData.image,
                 [imgName]: base64str
