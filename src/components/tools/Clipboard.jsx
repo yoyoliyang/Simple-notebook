@@ -1,9 +1,7 @@
 import React from "react"
 import { imgApi } from "./Env"
-import { useRef } from "react"
 const Clipboard = (props) => {
 
-    const textareaRef = useRef()
 
     // value为e.target.value数据，cursorPostion为当前光标位置，在光标位置插入剪切板数据
     const clip = async (value, cursorPosition) => {
@@ -30,12 +28,6 @@ const Clipboard = (props) => {
                 let cursorPosition = e.target.selectionStart
                 clip(value, cursorPosition)
                 // 此处需要处理光标位置返回问题
-                // e.target.focus()
-                // console.log(textareaRef.current.selectionEnd)
-                console.log(cursorPosition)
-                textareaRef.current.selectionEnd = cursorPosition
-                console.log(e.target.selectionEnd)
-                
             }
         }
     }
@@ -43,7 +35,7 @@ const Clipboard = (props) => {
     return (
         <div className="form-group">
             <label htmlFor="data" />
-            <textarea id="test" ref={textareaRef} rows="10" className="form-control" onKeyDown={(e) => handleKeyDown(e)} name="data" value={props.blogData.data} onChange={(e) => props.handleEdit(e)} placeholder="内容(支持markdown)" required />
+            <textarea  rows="10" className="form-control" onKeyDown={(e) => handleKeyDown(e)} name="data" value={props.blogData.data} onChange={(e) => props.handleEdit(e)} placeholder="内容(支持markdown)" required />
         </div>
     )
 }
