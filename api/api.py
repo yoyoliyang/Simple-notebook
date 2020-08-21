@@ -163,7 +163,7 @@ def blog_last(last):
                 return {'error': 'error list request page number'}, 400
             # 错误页数请求处理
             if req_page_num > page_count or req_page_num <= 0:
-                return {'error': 'error request page number'}, 400
+                return {'error': 'error request page number', 'count': blog.count()}
             else:
                 # skip跳过页面
                 result = blog.find(
