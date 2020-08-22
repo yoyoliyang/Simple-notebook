@@ -54,7 +54,8 @@ const Header = (props) => {
             <header className="blog-header py-3">
                 <div className="row flex-nowrap justify-content-between align-items-center">
                     <div className="col-4 text-left">
-                        <Link className="blog-header-logo text-dark" to="/">Simple notebook</Link>
+                        {/* 此处暂时不要用Link的形式来跳转 */}
+                        <a href="/" className="blog-header-logo text-dark" >Simple notebook</a>
                     </div>
                     <div className="col-4 d-flex justify-content-end align-items-center">
                         {loginStatus ?

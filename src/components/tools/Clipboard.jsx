@@ -10,18 +10,23 @@ const Clipboard = (props) => {
     const clip = async (value, cursorPosition) => {
         let clipData = await navigator.clipboard.read()
         clipData = await clipData
-        const blob = await clipData[0].getType("image/png")
-        const reader = new FileReader()
-        reader.readAsDataURL(blob)
-        reader.onload = () => {
-            let base64data = reader.result
-            const timestamp = new Date().getTime()
-            const imgName = `${props.blogData._id}--${timestamp}`
-            let valueLength = value.length
-            let markdownText = `![${imgName}](${imgApi}/${imgName})` + '\n'
-            let data = value.slice(0, cursorPosition) + markdownText + value.slice(cursorPosition, valueLength)
-            props.handleInsertImage(data, imgName, base64data)
-            setCursor(cursorPosition + markdownText.length)
+        try {
+            const blob = await clipData[0].getType("image/png")
+            const reader = new FileReader()
+            reader.readAsDataURL(blob)
+            reader.onload = () => {
+                let base64data = reader.result
+                const timestamp = new Date().getTime()
+                const imgName = `${props.blogData._id}--${timestamp}`
+                let valueLength = value.length
+                // 此处注意不要用+'\n'的方式（https://eslint.org/docs/rules/no-useless-concat）
+                let markdownText = `![${imgName}](${imgApi}/${imgName})\n`
+                let data = value.slice(0, cursorPosition) + markdownText + value.slice(cursorPosition, valueLength)
+                props.handleInsertImage(data, imgName, base64data)
+                setCursor(cursorPosition + markdownText.length)
+            }
+        } catch (err) {
+            console.log('No images were found in the clipboard')
         }
     }
 
