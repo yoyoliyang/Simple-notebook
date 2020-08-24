@@ -12,6 +12,7 @@ import { Route, BrowserRouter as Router, Switch } from "react-router-dom"
 import { LoginTokenProvider, LoginStatusProvider } from "./components/LoginTokenContext"
 import { CookiesProvider } from "react-cookie"
 import NotFound from './components/NotFound';
+import { githubPageName } from './components/tools/Env'
 
 const App = () => {
 
@@ -22,13 +23,13 @@ const App = () => {
           <LoginStatusProvider>
             <Header />
             <Switch>
-              <Route exact path="/page" component={Page} />
-              <Route exact path="/add" component={Add} />
-              <Route exact path="/" component={List} />
-              <Route exact path="/login" component={Login} />
-              <Route exact path="/404" component={NotFound} />
+              <Route exact path={githubPageName + '/page'} component={Page} />
+              <Route exact path={githubPageName + '/add'} component={Add} />
+              <Route exact path={githubPageName} component={List} />
+              <Route exact path={githubPageName + '/login'} component={Login} />
+              <Route exact path={githubPageName + '/404'} component={NotFound} />
               {/* 此处注意排序 */}
-              <Route exact path="/:slug" component={View} />
+              <Route exact path={githubPageName + '/:slug'} component={View} />
             </Switch>
             <Footer />
           </LoginStatusProvider>

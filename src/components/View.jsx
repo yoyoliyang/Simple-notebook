@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom"
 import Md from "./tools/Markdown"
 import { useCookies } from "react-cookie"
 import { LoginStatusContext } from "./LoginTokenContext"
-import {blogDataApi} from "./tools/Env"
+import { blogDataApi, githubPageName } from "./tools/Env"
 
 // /blog
 const View = (props) => {
@@ -27,30 +27,36 @@ const View = (props) => {
                 result = await result.json()
                 setBlogData(result)
             } else {
-                props.history.push('/404')
+                props.history.push(githubPageName + '/404')
             }
         } catch (err) {
             setApiInfo(`API err(${err.message})`)
         }
-    },[props.history])
+    }, [props.history])
 
     const fetchDeleteBlogData = async () => {
-        await fetch(blogDataApi + 'del', {
-            method: 'POST',
-            body: JSON.stringify({
-                _id: blogData._id,
-                token: cookies.token
-            }),
-            headers: new Headers({
-                'Content-Type': 'application/json'
+        try {
+            let result = await fetch(blogDataApi + 'del', {
+                method: 'POST',
+                body: JSON.stringify({
+                    _id: blogData._id,
+                    token: cookies.token
+                }),
+                headers: new Headers({
+                    'Content-Type': 'application/json'
+                })
             })
-        })
+            if (result.ok) {
+                props.history.push(githubPageName)
+            }
+        } catch (err) {
+            setApiInfo(`API err(${err.message})`)
+        }
     }
 
     const handleDelete = (e) => {
         fetchDeleteBlogData()
         e.preventDefault()
-        props.history.push("/")
     }
 
     const handleEdit = (b) => {

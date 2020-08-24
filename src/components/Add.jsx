@@ -4,7 +4,7 @@ import NotFound from "./NotFound"
 import { v4 as uuid4 } from 'uuid'
 import { useCookies } from "react-cookie"
 import { LoginStatusContext } from "./LoginTokenContext"
-import { blogDataApi } from "./tools/Env"
+import { blogDataApi, githubPageName } from "./tools/Env"
 import Clipboard from "./tools/Clipboard"
 
 const Add = (props) => {
@@ -53,7 +53,7 @@ const Add = (props) => {
             })
             if (result.ok) {
                 result = await result.json()
-                props.history.push('/' + blogData._id)
+                props.history.push(githubPageName + '/' + blogData._id)
             }
         } catch (err) {
             setApiInfo(`API err(${err.message})`)

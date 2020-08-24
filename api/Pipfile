@@ -12,6 +12,7 @@ flask-cors = "*"
 python-dotenv = "*"
 pymongo = "*"
 pyjwt = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.8"

@@ -29,13 +29,14 @@ def log_color(s):
 
 @app.cli.command('reset-user')
 def reset_user():
-    """reset user to default(admin,admin)"""
+    """reset user to default(admin,your password)"""
+    pswd = input('input password:')
     with MongoClient(os.getenv('MONGO_URI')) as c:
         user = c.simpleBlog.user
         user.find_one_and_delete({'user': 'admin'})
         user.insert_one({
             'username': 'admin',
-            'password': generate_password_hash('admin')
+            'password': generate_password_hash(pswd)
         })
 
 
@@ -62,6 +63,7 @@ def token_required(f):
 def user():
     if request.method == 'POST':
         request_data = request.get_json()
+        print(request_data)
         with MongoClient(os.getenv('MONGO_URI')) as c:
             user = c.simpleBlog.user
             username = request_data.get('username')
@@ -259,7 +261,7 @@ def blog_delete():
                 if result:
                     return {'info': f'blog with id({_id}) successfully deleted'}
                 else:
-                    return {'error': f'blog with id({_id}) not found'}
+                    return {'error': f'blog with id({_id}) not found'}, 400
         else:
             return {'error': 'error requests'}, 400
     return {'info': 'blog del api'}

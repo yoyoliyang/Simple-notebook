@@ -2,13 +2,13 @@ import React, { useState, useContext, useEffect } from "react"
 import { useCookies } from "react-cookie"
 import { LoginTokenContext, LoginStatusContext } from "./LoginTokenContext"
 import { MainClass } from './tools/Class'
+import { userApi, githubPageName } from './tools/Env'
 
 const Login = (props) => {
     const [token, setToken] = useContext(LoginTokenContext)
     const [loginStatus, setLoginStatus] = useContext(LoginStatusContext)
     const [cookies, setCookie] = useCookies('token')
 
-    const userApi = "https://192.168.1.123:5000/api/user"
 
     const [loginData, setLoginData] = useState({
         username: '',
@@ -20,7 +20,7 @@ const Login = (props) => {
 
     useEffect(() => {
         if (loginStatus) {
-            props.history.push('/')
+            props.history.push(githubPageName)
         }
     }, [loginStatus, props.history])
 
@@ -58,7 +58,7 @@ const Login = (props) => {
             } else {
                 result = await result.json()
                 setApiInfo(result.info)
-                props.history.push('/login')
+                props.history.push(githubPageName + '/login')
             }
         } catch (err) {
             setApiInfo(`API error(${err.message})`)
@@ -77,11 +77,11 @@ const Login = (props) => {
                 <form className="form-signin" onSubmit={(e) => handleSubmit(e)}>
                     <div className="form-group">
                         <label htmlFor="username" />
-                        <input className="form-control" name="username" value={loginData.username} onChange={(e) => handleEdit(e)} placeholder="用户名" autoFocus required />
+                        <input className="form-control" name="username" type="text" value={loginData.username} onChange={(e) => handleEdit(e)} placeholder="用户名" autoFocus required />
                     </div>
                     <div className="form-group">
                         <label htmlFor="password" />
-                        <input rows="10" className="form-control" name="password" value={loginData.password} onChange={(e) => handleEdit(e)} placeholder="密码" autoFocus required />
+                        <input rows="10" className="form-control" name="password" type="password" value={loginData.password} onChange={(e) => handleEdit(e)} placeholder="密码" autoFocus required />
                     </div>
                     <button type="submit" className="btn btn-primary" >Submit
                     </button>

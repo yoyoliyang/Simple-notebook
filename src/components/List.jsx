@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react"
 import SideBar from './SideBar'
 import { Link } from "react-router-dom"
 import Md from "./tools/Markdown"
-import {blogDataApi} from "./tools/Env"
+import { blogDataApi, githubPageName } from "./tools/Env"
 import loading from "../loading.svg"
 
 const List = (props) => {
@@ -15,7 +15,6 @@ const List = (props) => {
     const [searchCount, setSearchCount] = useState()
     const [apiInfo, setApiInfo] = useState()
 
-
     const fetchBlogList = useCallback(async (count) => {
         if (count) {
             try {
@@ -24,9 +23,10 @@ const List = (props) => {
                     result = await result.json()
                     if (result.count === 0) {
                         // 空数据库（没有任何blog的时候）跳转到add页面以添加
-                        props.history.push('/add')
+                        props.history.push(githubPageName + '/add')
+                    } else {
+                        setBlogList(result)
                     }
-                    setBlogList(result)
                 }
             } catch (err) {
                 setApiInfo(`API error(${err.message})`)
@@ -73,7 +73,7 @@ const List = (props) => {
                 {searchData.map((item, index) => {
                     return (
                         <div className="blog-post" key={index}>
-                            <h2 className="blog-post-title" ><Link to={"/" + item._id}>{item.subject}</Link></h2>
+                            <h2 className="blog-post-title" ><Link to={githubPageName + '/' + item._id}>{item.subject}</Link></h2>
                             <p className="blog-post-meta">
                                 {/* 此处将item中的时间戳转化为可读模式 */}
                                 {item ? new Date(item.timestamp).toLocaleString() : <img src={loading} alt={loading} />}
@@ -91,10 +91,10 @@ const List = (props) => {
                 {blogList.map((item, index) => {
                     return (
                         <div className="blog-post" key={index} >
-                            <h2 className="blog-post-title" ><Link to={"/" + item._id}>{item.subject}</Link></h2>
+                            <h2 className="blog-post-title" ><Link to={githubPageName + '/' + item._id}>{item.subject}</Link></h2>
                             <p className="blog-post-meta">
                                 {/* 此处将item中的时间戳转化为可读模式 */}
-                                {item.timestamp ? new Date(item.timestamp).toLocaleString() : <img src={loading} alt={loading}/>}
+                                {item.timestamp ? new Date(item.timestamp).toLocaleString() : <img src={loading} alt={loading} />}
                             </p>
                             <Md source={item.data} />
                         </div>
