@@ -4,7 +4,7 @@ import NotFound from "./NotFound"
 import { v4 as uuid4 } from 'uuid'
 import { useCookies } from "react-cookie"
 import { LoginStatusContext } from "./LoginTokenContext"
-import { blogDataApi, githubPageName } from "./tools/Env"
+import { blogDataApi} from "./tools/Env"
 import Clipboard from "./tools/Clipboard"
 
 const Add = (props) => {
@@ -53,7 +53,7 @@ const Add = (props) => {
             })
             if (result.ok) {
                 result = await result.json()
-                props.history.push(githubPageName + '/' + blogData._id)
+                props.history.push('/' + blogData._id)
             }
         } catch (err) {
             setApiInfo(`API err(${err.message})`)
@@ -65,6 +65,10 @@ const Add = (props) => {
         e.preventDefault()
     }
 
+    const handleCancel = (e) => {
+        props.history.push('/')
+        e.preventDefault()
+    }
     return (
         <>
             {loginStatus ?
@@ -77,7 +81,7 @@ const Add = (props) => {
                             </div>
                             <Clipboard blogData={blogData} handleEdit={handleEdit} handleInsertImage={handleInsertImage} />
                             <button type="submit" className="btn btn-primary" >Submit</button>
-                            <button className="btn btn-sm" >Cancel</button>
+                            <button className="btn btn-sm" onClick={e => handleCancel(e)}>Cancel</button>
                             {apiInfo ? <span className="ml-4 text-danger">{apiInfo}</span> : ''}
                         </form>
                     </MainClass>

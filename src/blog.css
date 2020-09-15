@@ -108,6 +108,9 @@ h1, h2, h3, h4, h5, h6 {
 .blog-post {
   margin-bottom: 2rem;
 }
+.blog-post img {
+  width: 450px;
+}
 
 .blog-post-title {
   margin-bottom: .25rem;

@@ -18,6 +18,10 @@ app = Flask(__name__, static_folder="../build", static_url_path="/")
 CORS(app)
 
 
+secret_key = os.getenv('SECRET_KEY')
+if not secret_key:
+    raise TypeError('err for ENV SECRET_KEY')
+
 # debug调试输出颜色
 def log_color(s):
     CRED = '\033[91m'
@@ -25,8 +29,6 @@ def log_color(s):
     return CRED+s+CEND
 
 # 重置管理员
-
-
 @app.cli.command('reset-user')
 def reset_user():
     """reset user to default(admin,your password)"""

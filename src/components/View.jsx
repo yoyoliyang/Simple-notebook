@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom"
 import Md from "./tools/Markdown"
 import { useCookies } from "react-cookie"
 import { LoginStatusContext } from "./LoginTokenContext"
-import { blogDataApi, githubPageName } from "./tools/Env"
+import { blogDataApi } from "./tools/Env"
 
 // /blog
 const View = (props) => {
@@ -27,7 +27,7 @@ const View = (props) => {
                 result = await result.json()
                 setBlogData(result)
             } else {
-                props.history.push(githubPageName + '/404')
+                props.history.push('/404')
             }
         } catch (err) {
             setApiInfo(`API err(${err.message})`)
@@ -47,7 +47,7 @@ const View = (props) => {
                 })
             })
             if (result.ok) {
-                props.history.push(githubPageName)
+                props.history.push('/')
             }
         } catch (err) {
             setApiInfo(`API err(${err.message})`)

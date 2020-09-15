@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useCallback, useState } from "react"
 import { Link, withRouter } from "react-router-dom"
 import { LoginStatusContext } from "./LoginTokenContext"
 import { useCookies } from "react-cookie"
-import { tokenApi, githubPageName } from './tools/Env'
+import { tokenApi } from './tools/Env'
 
 const Header = (props) => {
     // Header包含了一个check_token的函数，用来检测token是否有效
@@ -14,7 +14,7 @@ const Header = (props) => {
     const handleLogout = () => {
         removeCookie('token')
         setLoginStatus(false)
-        props.history.push(githubPageName+'/login')
+        props.history.push('/login')
     }
 
     const checkToken = useCallback(async () => {
@@ -55,18 +55,18 @@ const Header = (props) => {
                 <div className="row flex-nowrap justify-content-between align-items-center">
                     <div className="col-4 text-left">
                         {/* 此处暂时不要用Link的形式来跳转 */}
-                        <a href={githubPageName} className="blog-header-logo text-dark" >Simple notebook</a>
+                        <a href="/" className="blog-header-logo text-dark" >Simple notebook</a>
                     </div>
                     <div className="col-4 d-flex justify-content-end align-items-center">
                         {loginStatus ?
                             <>
-                                <Link className="btn btn-sm text-primary" to={githubPageName + '/add'} >Add</Link>
+                                <Link className="btn btn-sm text-primary" to={'/add'} >Add</Link>
                                 <button className="btn btn-sm btn-outline-secondary" onClick={handleLogout} >Logout</button>
                             </>
                             :
                             <>
                                 {apiInfo ? <span className="mr-4 text-danger">{apiInfo}</span> : ''}
-                                <Link className="btn btn-sm btn-outline-secondary" to={githubPageName + '/login'} >Login</Link>
+                                <Link className="btn btn-sm btn-outline-secondary" to={'/login'} >Login</Link>
                             </>
                         }
                     </div>
@@ -74,8 +74,8 @@ const Header = (props) => {
             </header>
             <div className="nav-scroller py-1 mb-2">
                 <nav className="nav d-flex justify-content-between">
-                    <Link className="p-2 text-muted" to={githubPageName}>Home</Link>
-                    <Link className="p-2 text-muted" to={githubPageName + '/page'} > Page</Link>
+                    <Link className="p-2 text-muted" to="/">Home</Link>
+                    <Link className="p-2 text-muted" to={'/page'} > Page</Link>
                 </nav>
             </div>
         </div>

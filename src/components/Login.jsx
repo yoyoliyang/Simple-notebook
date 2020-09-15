@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from "react"
 import { useCookies } from "react-cookie"
 import { LoginTokenContext, LoginStatusContext } from "./LoginTokenContext"
 import { MainClass } from './tools/Class'
-import { userApi, githubPageName } from './tools/Env'
+import { userApi } from './tools/Env'
 
 const Login = (props) => {
     const [token, setToken] = useContext(LoginTokenContext)
@@ -20,7 +20,7 @@ const Login = (props) => {
 
     useEffect(() => {
         if (loginStatus) {
-            props.history.push(githubPageName)
+            props.history.push("/")
         }
     }, [loginStatus, props.history])
 
@@ -58,7 +58,7 @@ const Login = (props) => {
             } else {
                 result = await result.json()
                 setApiInfo(result.info)
-                props.history.push(githubPageName + '/login')
+                props.history.push('/login')
             }
         } catch (err) {
             setApiInfo(`API error(${err.message})`)
