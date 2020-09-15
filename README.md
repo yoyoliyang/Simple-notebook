@@ -1,3 +1,6 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-https://yoyoliyang.github.io/simple-blog/
+react 练手项目 flask+mongodb+react
+
+静态文件访问链接：
+https://yuedouzi.github.io
